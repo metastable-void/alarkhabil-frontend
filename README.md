@@ -4,9 +4,18 @@ Frontend codes for Al Arkhabil, the independent thought publication platform.
 
 * [Backend code GitHub](https://github.com/metastable-void/alarkhabil-server)
 
+## Build
+
+```
+cargo build
+```
+
 ## Configuration
 
 ```
+cp ./example.env ./.env
+# edit ./.env
+
 cp -r ./branding-default ./branding
 # edit files in ./branding
 
