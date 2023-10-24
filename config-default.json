@@ -5,6 +5,10 @@
     "header_navigation": [],
     "footer_navigation": [
         {
+            "text": "Top",
+            "url": "/"
+        },
+        {
             "text": "Menhera.org",
             "url": "https://www.menhera.org/"
         }
