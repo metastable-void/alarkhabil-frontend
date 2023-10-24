@@ -1,0 +1,143 @@
+/* -*- indent-tabs-mode: nil; tab-width: 2; -*- */
+/* vim: set ts=2 sw=2 et ai : */
+
+:root, body {
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  min-width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#topbar {
+  display: flex;
+  flex-direction: row;
+  position: -webkit-sticky;
+  position: sticky;
+  inset-block-start: 0;
+  border-block-end: solid 2px transparent;
+  padding-inline: 16px;
+  box-sizing: border-box;
+  inline-size: 100%;
+  overflow-inline: auto;
+}
+
+#topbar-branding-link {
+  display: flex;
+  flex-direction: row;
+}
+
+#topbar-branding-icon {
+  display: block;
+  inline-size: 64px;
+  min-block-size: 64px;
+  font-size: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+}
+
+#topbar-branding-icon > .inner {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+#topbar-branding-logotype {
+  display: block;
+  inline-size: 192px;
+  min-block-size: 64px;
+  font-size: 0;
+}
+
+#topbar-branding-logotype > .inner {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+#topbar-navigation {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+#topbar-navigation > ul {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  justify-content: end;
+  align-items: center;
+}
+
+#topbar-navigation > ul > li {
+  margin-inline: 1em;
+}
+
+#topbar-navigation a {
+  color: inherit;
+}
+
+#content {
+  flex: 1;
+}
+
+#content > :not(.fullwidth) {
+  max-inline-size: 640px;
+  margin-inline: auto;
+}
+
+#content > :not(.nopadding) {
+  padding-inline: 16px;
+}
+
+#global-footer-branding {
+  margin-block: 1em;
+  max-inline-size: 640px;
+  margin-inline: auto;
+  text-align: center;
+  padding-inline: 16px;
+}
+
+#global-footer-branding-logo {
+  block-size: 128px;
+  font-size: 0;
+}
+
+#global-footer-branding-legal {
+  margin-block-start: 1em;
+  border-block-start: solid currentColor 1px;
+  padding-block-start: 1em;
+  font-size: 80%;
+}
+
+#global-footer-navigation {
+  padding-inline: 1em;
+  padding-block: 1em;
+}
+
+#global-footer-navigation > ul {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex-wrap: wrap;
+  column-gap: 2em;
+  row-gap: 1em;
+}

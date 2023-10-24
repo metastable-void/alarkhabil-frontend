@@ -1,0 +1,12 @@
+{
+    "site_name": "Al Arkhabil الأرخبيل",
+    "site_description": "Al Arkhabil is an independent thought publication platform developed in Japan.",
+    "site_copyright": "© Copyright subject to their respective owners.",
+    "header_navigation": [],
+    "footer_navigation": [
+        {
+            "text": "Menhera.org",
+            "url": "https://www.menhera.org/"
+        }
+    ]
+}

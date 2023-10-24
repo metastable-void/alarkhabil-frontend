@@ -1,0 +1,55 @@
+/* -*- indent-tabs-mode: nil; tab-width: 2; -*- */
+/* vim: set ts=2 sw=2 et ai : */
+
+:root, body {
+  font-family: system-ui, sans-serif;
+}
+
+::selection {
+  background-color: var(--selection-color);
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+#topbar {
+  border-block-end-color: var(--accent-color) !important;
+  background-color: #fff !important;
+  box-shadow: 0 0 16px #fff;
+  color: #333;
+}
+
+#topbar-branding-icon {
+  background-color: var(--accent-color);
+}
+
+#topbar-branding-icon > .inner {
+  background-color: #fff;
+  mask: var(--url-logo) center / contain no-repeat add alpha;
+}
+
+#topbar-branding-logotype {
+  background-color: var(--accent-color);
+  mask: var(--url-logotype) center / contain no-repeat add alpha;
+}
+
+#content {
+  background-color: #fff;
+  color: #333;
+}
+
+#global-footer {
+  background-color: #333;
+  color: #fff;
+}
+
+#global-footer-branding-logo {
+  background-color: #fff;
+  mask: var(--url-logo) center / contain no-repeat add alpha;
+}

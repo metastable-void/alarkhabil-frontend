@@ -1,0 +1,57 @@
+<!-- -*- indent-tabs-mode: nil; tab-width: 2; -*- -->
+<!-- vim: set ts=&2 sw=2 et ai : -->
+<!DOCTYPE html>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <meta charset='utf-8'/>
+    <title>{% if title.len() == 0 %}{{ site_name }}{% else %}{{ title }} - {{ site_name }}{% endif %}</title>
+    <link rel='icon' href='/branding/favicon.svg'/>
+    <meta name='viewport' content='width=device-width, initial-scale=1'/>
+    <link rel='stylesheet' href='/branding/branding.css'/>
+    <link rel='stylesheet' href='/assets/css/main.css'/>
+    <link rel='stylesheet' href='/assets/css/theme.css'/>
+  </head>
+  <body>
+    <header id="topbar">
+      <div id="topbar-branding">
+        <a id="topbar-branding-link" href="#">
+          <span id="topbar-branding-icon">
+            <span class="inner">logo</span>
+          </span>
+          <span id="topbar-branding-logotype">
+            <span class="inner">{{ site_name }}</span>
+          </span>
+        </a>
+      </div>
+      <nav id="topbar-navigation">
+        <ul>
+          {% for item in header_navigation %}<li><a href="{{ item.url }}">{{ item.text }}</a></li>{% endfor %}
+        </ul>
+      </nav>
+    </header>
+    <div id="content">
+      <aside id="content-top-tools"></aside>
+      <main id="content-main">
+        <header id="content-main-header">
+          <h1>Article title</h1>
+          <time datetime="2017-01-01">2017-01-01</time>
+          <address>Author name</address>
+        </header>
+        <div id="content-main-text">{{ body_html|safe }}</div>
+      </main>
+      <aside id="content-bottom-tools"></aside>
+    </div>
+    <footer id="global-footer">
+      <div id="global-footer-branding">
+        <div id="global-footer-branding-logo">logo</div>
+        <div id="global-footer-branding-description">{{ site_description }}</div>
+        <div id="global-footer-branding-legal">{{ site_copyright }}</div>
+      </div>
+      <nav id="global-footer-navigation">
+        <ul>
+          {% for item in footer_navigation %}<li><a href="{{ item.url }}">{{ item.text }}</a></li>{% endfor %}
+        </ul>
+      </nav>
+    </footer>
+  </body>
+</html>
