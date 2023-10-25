@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 use hyper::{Request, StatusCode};
 use axum::{
-    routing::get,
+    routing::{get, post},
     Router,
     Server,
     response::{IntoResponse, Response},
@@ -30,6 +30,7 @@ async fn handler_404() -> impl IntoResponse {
     StatusCode::NOT_FOUND
 }
 
+/// Middleware to add global headers to all responses.
 async fn add_global_headers<B>(req: Request<B>, next: Next<B>) -> Response {
     let mut res = next.run(req).await;
     let headers = res.headers_mut();
@@ -57,12 +58,18 @@ async fn main() -> anyhow::Result<()> {
     // define routes
     let app = Router::new()
         .route("/", get(handler::handler_root))
+
+        // assets directories
         .nest_service("/branding", ServeDir::new(branding_dir))
         .nest_service("/assets", ServeDir::new("assets"))
+
+        // frontend api
+        .route("/frontend/api/v1/markdown/parse", post(handler::api_v1_markdown_parse))
 
         // 404 page
         .fallback(handler_404)
 
+        // add global headers
         .layer(axum::middleware::from_fn(add_global_headers));
 
     // run server

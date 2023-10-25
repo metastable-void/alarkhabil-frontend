@@ -1,4 +1,10 @@
 
+mod api;
+
+
+pub use api::api_v1_markdown_parse;
+
+
 use axum::response::IntoResponse;
 
 use crate::error_reporting::result_into_response;
@@ -20,7 +26,7 @@ pub async fn handler_root() -> impl IntoResponse {
             footer_navigation: config.footer_navigation.unwrap_or_else(|| vec![]),
             body_html: "Hello, world!".to_string(),
         };
-        
+
         Ok(HtmlTemplate(template))
     }).await
 }
