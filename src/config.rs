@@ -1,5 +1,8 @@
+//! This whole scheme fails when the default configuration is broken on compile time.
+
 
 use std::env;
+use std::sync::OnceLock;
 
 use tokio::fs;
 
@@ -7,27 +10,87 @@ use serde::{Serialize, Deserialize};
 
 use crate::template::NavigationItem;
 
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
-    pub site_name: Option<String>,
-    pub site_description: Option<String>,
-    pub site_copyright: Option<String>,
-    pub header_navigation: Option<Vec<NavigationItem>>,
-    pub footer_navigation: Option<Vec<NavigationItem>>,
+    #[serde(default = "Config::default_site_name")]
+    pub site_name: String, // also used for OGP
+
+    #[serde(default = "Config::default_site_description")]
+    pub site_description: String,
+
+    #[serde(default = "Config::default_site_copyright")]
+    pub site_copyright: String,
+
+    #[serde(default = "Config::default_header_navigation")]
+    pub header_navigation: Vec<NavigationItem>,
+
+    #[serde(default = "Config::default_footer_navigation")]
+    pub footer_navigation: Vec<NavigationItem>,
+
+    #[serde(default = "Config::default_top_url")]
+    pub top_url: String, // used for OGP
+
+    #[serde(default = "Config::default_og_image")]
+    pub og_image: String,
 }
 
-fn load_default_config_bytes() -> Vec<u8> {
-    let config_bytes = include_bytes!("../config-default.json");
-    config_bytes.to_vec()
+static CONFIG: OnceLock<Config> = OnceLock::new();
+
+impl Config {
+    pub fn default_ref() -> &'static Config {
+        CONFIG.get_or_init(|| {
+            let config_bytes = include_bytes!("../config-default.json");
+            serde_json::from_slice(config_bytes).unwrap()
+        })
+    }
+
+    pub fn default_site_name() -> String {
+        Self::default_ref().site_name.clone()
+    }
+
+    pub fn default_site_description() -> String {
+        Self::default_ref().site_description.clone()
+    }
+
+    pub fn default_site_copyright() -> String {
+        Self::default_ref().site_copyright.clone()
+    }
+
+    pub fn default_header_navigation() -> Vec<NavigationItem> {
+        Self::default_ref().header_navigation.clone()
+    }
+
+    pub fn default_footer_navigation() -> Vec<NavigationItem> {
+        Self::default_ref().footer_navigation.clone()
+    }
+
+    pub fn default_top_url() -> String {
+        Self::default_ref().top_url.clone()
+    }
+
+    pub fn default_og_image() -> String {
+        Self::default_ref().og_image.clone()
+    }
 }
 
-pub async fn load_config() -> Result<Config, anyhow::Error> {
+impl Default for Config {
+    fn default() -> Self {
+        Config::default_ref().clone()
+    }
+}
+
+pub async fn load_config() -> Config {
     let config_path = env::var("CONFIG_FILE").unwrap_or_else(|_| "config.json".to_string());
     let config_bytes = if let Ok(config_bytes) = fs::read(&config_path).await {
         config_bytes
     } else {
-        load_default_config_bytes()
+        return Config::default();
     };
-    let config: Config = serde_json::from_slice(&config_bytes)?;
-    Ok(config)
+
+    if let Ok(config) = serde_json::from_slice(&config_bytes) {
+        config
+    } else {
+        Config::default()
+    }
 }
