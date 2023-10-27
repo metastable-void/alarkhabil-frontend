@@ -20,6 +20,8 @@ URL | Queries (processed by JS) | Description
 /authors/**:author_uuid**/ | - | Author information and latest posts by the author
 /tags/ | - | List of tags
 /tags/**:tag_name**/ | - | List of posts with the tag
+/meta/ | `?action=new_page` | List of meta pages
+/meta/**:page_name**/ | `?action=edit` | A meta page.
 
 ### Frontend API
 
