@@ -13,6 +13,9 @@ use crate::template::NavigationItem;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
+    #[serde(default = "Config::default_api_url")]
+    pub api_url: String, // absolute url
+
     #[serde(default = "Config::default_site_name")]
     pub site_name: String, // also used for OGP
 
@@ -43,6 +46,10 @@ impl Config {
             let config_bytes = include_bytes!("../config-default.json");
             serde_json::from_slice(config_bytes).unwrap()
         })
+    }
+
+    pub fn default_api_url() -> String {
+        Self::default_ref().api_url.clone()
     }
 
     pub fn default_site_name() -> String {
