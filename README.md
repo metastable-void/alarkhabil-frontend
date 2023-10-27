@@ -28,6 +28,7 @@ URL | Queries (processed by JS) | Description
 Method | URL | Description
 -------|-----|------------
 GET | /frontend/api/v1/config/get | Get site config
+GET | /frontend/api/v1/timestamp/format?timestamp={u64} | Format UNIX timestamp
 POST | /frontend/api/v1/markdown/parse | Parse Markdown into HTML
 
 ## Build
