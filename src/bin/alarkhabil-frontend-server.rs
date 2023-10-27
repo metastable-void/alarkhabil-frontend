@@ -4,12 +4,12 @@ use std::net::SocketAddr;
 use std::str::FromStr;
 use std::path::PathBuf;
 
-use hyper::{Request, StatusCode};
+use hyper::Request;
 use axum::{
     routing::{get, post},
     Router,
     Server,
-    response::{IntoResponse, Response},
+    response::Response,
     middleware::Next,
 };
 use tower_http::services::ServeDir;
@@ -24,10 +24,6 @@ static RESPONSE_HEADER_X_CONTENT_TYPE_OPTIONS: &str = "nosniff";
 
 fn is_dir(path: &str) -> bool {
     PathBuf::from(path).is_dir()
-}
-
-async fn handler_404() -> impl IntoResponse {
-    StatusCode::NOT_FOUND
 }
 
 /// Middleware to add global headers to all responses.
@@ -68,7 +64,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/frontend/api/v1/config/get", get(handler::api_v1_config_get))
 
         // 404 page
-        .fallback(handler_404)
+        .fallback(handler::handler_404)
 
         // add global headers
         .layer(axum::middleware::from_fn(add_global_headers));

@@ -7,6 +7,11 @@ pub use api::api_v1_config_get;
 
 
 use axum::response::IntoResponse;
+use axum::http::{
+    Request,
+    StatusCode,
+};
+use axum::body::Body;
 
 use crate::error_reporting::result_into_response;
 use crate::config;
@@ -17,7 +22,6 @@ pub async fn handler_root() -> impl IntoResponse {
     result_into_response(async move {
         let config = config::load_config().await;
 
-        // defaults here are never displayed because there is a default config file compiled into the binary
         let template = BaseTemplate::try_new(
             "/",
             None,
@@ -26,5 +30,24 @@ pub async fn handler_root() -> impl IntoResponse {
         )?;
 
         Ok(HtmlTemplate(template))
+    }).await
+}
+
+pub async fn handler_404(request: Request<Body>) -> impl IntoResponse {
+    result_into_response(async move {
+        let config = config::load_config().await;
+        let url = request.uri().path().to_string();
+
+        let template = BaseTemplate::try_new(
+            &url,
+            Some("Not Found"),
+            "<h1>404: Not Found</h1>",
+            &config,
+        )?;
+
+        Ok((
+            StatusCode::NOT_FOUND,
+            HtmlTemplate(template)
+        ))
     }).await
 }
