@@ -65,6 +65,7 @@ async fn main() -> anyhow::Result<()> {
 
         // frontend api
         .route("/frontend/api/v1/markdown/parse", post(handler::api_v1_markdown_parse))
+        .route("/frontend/api/v1/config/get", get(handler::api_v1_config_get))
 
         // 404 page
         .fallback(handler_404)

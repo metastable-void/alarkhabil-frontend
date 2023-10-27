@@ -3,6 +3,7 @@ mod api;
 
 
 pub use api::api_v1_markdown_parse;
+pub use api::api_v1_config_get;
 
 
 use axum::response::IntoResponse;

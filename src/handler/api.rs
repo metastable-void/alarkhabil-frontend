@@ -7,6 +7,7 @@ use axum::{
 };
 
 use crate::markdown;
+use crate::config;
 
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -21,4 +22,9 @@ pub async fn api_v1_markdown_parse(
     Json(serde_json::json!({
         "html": html,
     }))
+}
+
+pub async fn api_v1_config_get() -> impl IntoResponse {
+    let config = config::load_config().await;
+    Json(config)
 }
