@@ -15,7 +15,7 @@ URL | Queries (processed by JS) | Description
 /account/ | - | JS required: account information and settings
 /c/ | - | List of channels
 /c/**:channel_handle**/ | `?action={edit,new_post}` | Channel information and latest posts of the channel
-/c/**:channel_handle**/`:post_uuid`/ | `?action=edit` | A post in a channel
+/c/**:channel_handle**/**:post_uuid**/ | `?action=edit` | A post in a channel
 /authors/ | - | List of authors
 /authors/**:author_uuid**/ | - | Author information and latest posts by the author
 /tags/ | - | List of tags
