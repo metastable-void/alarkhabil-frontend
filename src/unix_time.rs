@@ -44,6 +44,11 @@ impl UnixTime {
         let utc_datetime = self.naive_datetime();
         timezone.from_utc_datetime(&utc_datetime)
     }
+
+    pub fn default_format_in_timezone(&self, timezone: Tz) -> String {
+        let datetime = self.to_datetime(timezone);
+        datetime.format("%Y-%m-%d %H:%M:%S %Z").to_string()
+    }
 }
 
 impl Display for UnixTime {

@@ -4,6 +4,7 @@ mod api;
 
 pub use api::api_v1_markdown_parse;
 pub use api::api_v1_config_get;
+pub use api::api_v1_timestamp_format;
 
 
 use axum::response::IntoResponse;
@@ -26,11 +27,10 @@ pub async fn handler_root() -> impl IntoResponse {
         let config = config::load_config().await;
 
         let now = UnixTime::now();
-        let datetime = now.to_datetime(config.server_timezone());
 
         let content_template = ContentMetaPageTemplate {
             content_heading: "It works!".to_string(),
-            content_date: datetime.format("%Y-%m-%d %H:%M:%S %Z").to_string(),
+            content_date: now.default_format_in_timezone(config.server_timezone()),
             content_date_value: now.to_utc_datetime_string(),
             content_html: "<p>Hello, world!</p>".to_string(),
         };
