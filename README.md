@@ -13,7 +13,7 @@ URL | Queries (processed by JS) | Description
 /signup/ | `?token={invite token}` | JS required: create a new account
 /signin/ | - | JS required: sign in into an existing account
 /account/ | - | JS required: account information and settings
-/c/ | - | List of channels
+/c/ | `?action=new_channel` | List of channels
 /c/**:channel_handle**/ | `?action={edit,new_post}` | Channel information and latest posts of the channel
 /c/**:channel_handle**/**:post_uuid**/ | `?action=edit` | A post in a channel
 /authors/ | - | List of authors
