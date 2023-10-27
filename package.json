@@ -1,0 +1,26 @@
+{
+  "name": "@menhera/alarkhabil-frontend",
+  "version": "0.1.0",
+  "description": "Frontend codes for Al Arkhabil, the independent thought publication platform.",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/metastable-void/alarkhabil-frontend.git"
+  },
+  "author": "metastable-void",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/metastable-void/alarkhabil-frontend/issues"
+  },
+  "homepage": "https://github.com/metastable-void/alarkhabil-frontend#readme",
+  "devDependencies": {
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.2.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
