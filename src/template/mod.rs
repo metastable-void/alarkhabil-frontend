@@ -53,6 +53,12 @@ impl ContentTemplateItem {
             html: html.to_string(),
         }
     }
+
+    pub fn new_map<T: Iterator<Item = (String, String)>>(pairs: T) -> Vec<Self> {
+        pairs.map(|(template_id, html)| {
+            Self::new(&template_id, &html)
+        }).collect()
+    }
 }
 
 
@@ -71,13 +77,17 @@ pub static CONTENT_TEMPLATES: OnceLock<Vec<ContentTemplateItem>> = OnceLock::new
 
 pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
     CONTENT_TEMPLATES.get_or_init(|| {
-        vec![
-            ContentTemplateItem::new("content-meta-page", &ContentMetaPageTemplate::render(&ContentMetaPageTemplate {
-                content_heading: "".to_string(),
-                content_date: "".to_string(),
-                content_date_value: "".to_string(),
-                content_html: "".to_string(),
-            }).unwrap()),
-        ]
+        ContentTemplateItem::new_map(vec![
+            (
+                "content-meta-page".to_string(),
+                ContentMetaPageTemplate::render(&ContentMetaPageTemplate {
+                    content_heading: "".to_string(),
+                    content_date: "".to_string(),
+                    content_date_value: "".to_string(),
+                    content_html: "".to_string(),
+                }).unwrap(),
+            ),
+            ("content-invites".to_string(), include_str!("../../templates/content_invites.html").to_string()),
+        ].into_iter())
     })
 }
