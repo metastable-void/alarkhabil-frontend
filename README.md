@@ -33,6 +33,8 @@ POST | /frontend/api/v1/markdown/parse | Parse Markdown into HTML
 
 ## Build
 
+Node.js and Rust must be installed.
+
 ```
 npm install
 npm run build
