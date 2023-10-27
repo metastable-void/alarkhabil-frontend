@@ -34,6 +34,8 @@ POST | /frontend/api/v1/markdown/parse | Parse Markdown into HTML
 ## Build
 
 ```
+npm install
+npm run build
 cargo build
 ```
 
