@@ -4,6 +4,30 @@ Frontend codes for Al Arkhabil, the independent thought publication platform.
 
 * [Backend code GitHub](https://github.com/metastable-void/alarkhabil-server)
 
+## Routes
+
+URL | Queries (processed by JS) | Description
+----|---------|------------
+/ | - | Top: a list of latest posts
+/invites/ | - | JS required: create an invite
+/signup/ | `?token={invite token}` | JS required: create a new account
+/login/ | - | JS required: sign in into an existing account
+/account/ | - | JS required: account information and settings
+/c/ | - | List of channels
+/c/`:channel_handle`/ | `?action=(edit|new_post)` | Channel information and latest posts of the channel
+/c/`:channel_handle`/`:post_uuid`/ | `?action=edit` | A post in a channel
+/authors/ | - | List of authors
+/authors/`:author_uuid`/ | - | Author information and latest posts by the author
+/tags/ | - | List of tags
+/tags/`:tag_name`/ | - | List of posts with the tag
+
+### Frontend API
+
+Method | URL | Description
+-------|-----|------------
+GET | /frontend/api/v1/config/get | Get site config
+POST | /frontend/api/v1/markdown/parse | Parse Markdown into HTML
+
 ## Build
 
 ```
