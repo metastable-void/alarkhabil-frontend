@@ -11,7 +11,7 @@ URL | Queries (processed by JS) | Description
 / | - | Top: a list of latest posts
 /invites/ | - | JS required: create an invite
 /signup/ | `?token={invite token}` | JS required: create a new account
-/login/ | - | JS required: sign in into an existing account
+/signin/ | - | JS required: sign in into an existing account
 /account/ | - | JS required: account information and settings
 /c/ | - | List of channels
 /c/**:channel_handle**/ | `?action={edit,new_post}` | Channel information and latest posts of the channel

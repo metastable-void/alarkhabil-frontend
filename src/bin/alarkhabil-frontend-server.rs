@@ -53,7 +53,14 @@ async fn main() -> anyhow::Result<()> {
 
     // define routes
     let app = Router::new()
+        // top page
         .route("/", get(handler::handler_root))
+
+        // JavaScript required pages
+        .route("/invites/", get(handler::handler_javascript_required))
+        .route("/signup/", get(handler::handler_javascript_required))
+        .route("/signin/", get(handler::handler_javascript_required))
+        .route("/account/", get(handler::handler_javascript_required))
 
         // assets directories
         .nest_service("/branding", ServeDir::new(branding_dir))
