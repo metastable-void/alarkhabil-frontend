@@ -2,7 +2,11 @@
 use askama::Template;
 use url::Url;
 
-use crate::template::NavigationItem;
+use crate::template::{
+    NavigationItem,
+    ContentTemplateItem,
+    content_templates,
+};
 use crate::config::Config;
 
 #[derive(Template)]
@@ -18,6 +22,7 @@ pub struct BaseTemplate {
     pub footer_navigation: Vec<NavigationItem>,
     pub og_image: String, // absolute url
     pub content_html: String,
+    pub content_templates: Vec<ContentTemplateItem>,
 }
 
 impl BaseTemplate {
@@ -51,6 +56,7 @@ impl BaseTemplate {
             footer_navigation: config.footer_navigation.clone(),
             og_image,
             content_html: content_html.to_string(),
+            content_templates: content_templates().to_owned(),
         })
     }
 }

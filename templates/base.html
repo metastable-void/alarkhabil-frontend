@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="/branding/branding.css"/>
     <link rel="stylesheet" href="/assets/css/main.css"/>
     <link rel="stylesheet" href="/assets/css/theme.css"/>
+    {% for item in content_templates %}
+    <template id="{{ item.template_id }}">
+{{ item.html|safe }}
+    </template>
+    {% endfor %}
   </head>
   <body>
     <header id="topbar">
@@ -31,9 +36,7 @@
       </nav>
     </header>
     <div id="content">
-      <aside id="content-top-tools"></aside>
-      <main id="content-main">{{ content_html|safe }}</main>
-      <aside id="content-bottom-tools"></aside>
+{{ content_html|safe }}
     </div>
     <footer id="global-footer">
       <div id="global-footer-branding">

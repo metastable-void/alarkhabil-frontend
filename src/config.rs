@@ -6,6 +6,8 @@ use std::sync::OnceLock;
 
 use tokio::fs;
 
+use chrono_tz::Tz;
+
 use serde::{Serialize, Deserialize};
 
 use crate::template::NavigationItem;
@@ -36,6 +38,9 @@ pub struct Config {
 
     #[serde(default = "Config::default_og_image")]
     pub og_image: String,
+
+    #[serde(default = "Config::default_server_timezone")]
+    pub server_timezone: String,
 }
 
 static CONFIG: OnceLock<Config> = OnceLock::new();
@@ -78,6 +83,14 @@ impl Config {
 
     pub fn default_og_image() -> String {
         Self::default_ref().og_image.clone()
+    }
+
+    pub fn default_server_timezone() -> String {
+        Self::default_ref().server_timezone.clone()
+    }
+
+    pub fn server_timezone(&self) -> Tz {
+        self.server_timezone.parse().unwrap_or_else(|_| Tz::UTC)
     }
 }
 
