@@ -4,6 +4,10 @@ Frontend codes for Al Arkhabil, the independent thought publication platform.
 
 * [Backend code GitHub](https://github.com/metastable-void/alarkhabil-server)
 
+## Notes
+
+- This implementation does not support hosting on unsecured (not localhost nor https) sites. You will need an HTTPS-terminating reverse proxy for deploying this on the Internet.
+
 ## Routes
 
 URL | Queries (processed by JS) | Description
