@@ -1,6 +1,5 @@
 
 import * as utf8 from '../utf8';
-import { Sha256 } from './sha256';
 
 export interface AesMessage {
     readonly algo: 'aes-gcm';
@@ -14,25 +13,19 @@ export interface AesMessage {
 export class AesKey {
     readonly #key: CryptoKey;
 
-    /**
-     * The key ID is SHA-256 of the key in hex string.
-     */
-    public readonly keyId: string;
-
     public static async create(key: Uint8Array): Promise<AesKey> {
         if (key.length < 32) {
             throw new Error('Invalid key length.');
         }
         const trimmedKey = key.slice(0, 32);
-        const digest = await Sha256.digestHex(trimmedKey);
         const importedKey = await crypto.subtle.importKey("raw", trimmedKey, "AES-GCM", false, [
             "encrypt",
             "decrypt",
         ]);
-        return new AesKey(importedKey, digest);
+        return new AesKey(importedKey);
     }
 
-    private constructor(importedKey: CryptoKey, keyId: string) {
+    private constructor(importedKey: CryptoKey) {
         if (!(importedKey instanceof CryptoKey)) {
             throw new Error('Invalid key type.');
         }
@@ -53,7 +46,6 @@ export class AesKey {
             throw new Error('Invalid key type.');
         }
 
-        this.keyId = String(keyId);
         this.#key = importedKey;
         Object.freeze(this);
     }
