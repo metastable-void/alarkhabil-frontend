@@ -5,8 +5,9 @@ const deepFreezeInner = <T extends object>(obj: T, visited = new WeakSet<object>
     }
     visited.add(obj);
     const keys = Reflect.ownKeys(obj);
+    const records = obj as Record<string | symbol, unknown>;
     for (const key of keys) {
-        const value = obj[key];
+        const value = records[key];
         if (typeof value === 'object' && value !== null) {
             deepFreezeInner(value, visited);
         }

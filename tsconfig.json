@@ -6,6 +6,7 @@
         "sourceMap": true,
         "allowJs": true,
         "checkJs": false,
+        "strict": true,
         "moduleResolution": "node"
     }
 }

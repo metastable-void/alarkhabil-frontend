@@ -19,5 +19,6 @@ export interface SiteConfig {
 }
 
 export namespace SiteConfig {
-    export const INITIAL: SiteConfig = deepFreeze<SiteConfig>(JSON.parse(document.querySelector<HTMLMetaElement>('meta[name="site-config"]').content));
+    const metaTag = document.querySelector<HTMLMetaElement>('meta[name="site-config"]')!;
+    export const INITIAL: SiteConfig = deepFreeze<SiteConfig>(JSON.parse(metaTag.content));
 }

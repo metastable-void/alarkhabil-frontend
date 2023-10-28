@@ -3,6 +3,7 @@ import { SiteConfig } from "./site-config";
 import { FrontendApi } from "./frontend-api";
 import { BackendApi } from "./backend-api";
 import { deepFreeze } from "./freeze";
+import { PassphraseCredential } from "./passphrase";
 
 
 interface SingletonState {
@@ -23,9 +24,6 @@ export class Alarkhabil {
         if (new.target !== Alarkhabil) {
             throw new Error('Alarkhabil is a singleton class.');
         }
-        if (Alarkhabil.#instance) {
-            return Alarkhabil.#instance;
-        }
 
         // BEGIN Singleton initialization
         this.#state = {
@@ -34,6 +32,10 @@ export class Alarkhabil {
         this.frontendApi = new FrontendApi();
         this.backendApi = new BackendApi(this.#state.siteConfig.api_url, Alarkhabil.#BACKEND_API_UPDATE_TOKEN);
         // END Singleton initialization
+
+        if (Alarkhabil.#instance) {
+            return Alarkhabil.#instance;
+        }
 
         Alarkhabil.#instance = this;
         Object.freeze(Alarkhabil);
@@ -60,6 +62,10 @@ export class Alarkhabil {
             console.error(e);
             return this.#state.siteConfig;
         }
+    }
+
+    public createPassphraseCredential(uuid: string, passphrase: string): PassphraseCredential {
+        return new PassphraseCredential(uuid, passphrase);
     }
 }
 
