@@ -16,7 +16,7 @@ export class BackendApiInvite {
     public async createNew(inviteMakingToken: string): Promise<string> {
         const params = new URLSearchParams();
         params.set('token', inviteMakingToken);
-        const result = await this.#backendApi.v1.postEmpty<ResponseInviteNew>('invite/new', params);
+        const result = await this.#backendApi.v1.get<ResponseInviteNew>('invite/new', params);
         if (!result.ok) {
             throw new Error(`Failed to create new invite: ${result.status}`);
         }
