@@ -56,15 +56,21 @@ export class PassphraseCredential {
     public static readonly KEY_USE_LOCAL_ENCRYPTION = 'local_encryption';
 
     readonly #primaryKeyPromise: Promise<Uint8Array>;
+    readonly #uuid: Uuid;
 
     public constructor(uuidStr: string, passphrase: string) {
         const uuid = Uuid(uuidStr);
+        this.#uuid = uuid;
         this.#primaryKeyPromise = deriveKeyFromPassphrase(passphrase, uuid);
         Object.freeze(this);
     }
 
+    public get uuid(): Uuid {
+        return this.#uuid;
+    }
+
     async #getDerivedKey(keyName: string, keyIndex: number): Promise<Uint8Array> {
-        const keyIndexInt = keyIndex >>> 0;
+        const keyIndexInt = keyIndex >>> 0; // convert to unsigned int (32-bit)
         const primaryKey = await this.#primaryKeyPromise;
         const key = await deriveKey(primaryKey, `${keyName}_${keyIndexInt}`);
         return key;

@@ -4,12 +4,21 @@ import { FrontendApi } from "./frontend-api";
 import { BackendApi } from "./backend-api";
 import { deepFreeze } from "./freeze";
 import { PassphraseCredential } from "./passphrase";
+import { Uuid } from "./uuid";
 
 
+/**
+ * State of the singleton instance of Alarkhabil.
+ */
 interface SingletonState {
     siteConfig: SiteConfig;
+    authToken: symbol;
+    credential: PassphraseCredential | undefined;
 }
 
+/**
+ * Credentials are not saved on storage on purpose. Page reload will sign out the user.
+ */
 export class Alarkhabil {
     static readonly #BACKEND_API_UPDATE_TOKEN: unique symbol = Symbol('BACKEND_API_UPDATE_TOKEN');
 
@@ -28,6 +37,8 @@ export class Alarkhabil {
         // BEGIN Singleton initialization
         this.#state = {
             siteConfig: SiteConfig.INITIAL,
+            authToken: this.#generateAuthToken(),
+            credential: undefined,
         };
         this.frontendApi = new FrontendApi();
         this.backendApi = new BackendApi(this.#state.siteConfig.api_url, Alarkhabil.#BACKEND_API_UPDATE_TOKEN);
@@ -47,7 +58,7 @@ export class Alarkhabil {
         return this.#state.siteConfig;
     }
 
-    #handleSiteConfigChange = (newConfig: SiteConfig) => {
+    #handleSiteConfigChange(newConfig: SiteConfig) {
         // TODO: Handle site config change
         this.backendApi.updateUrl(newConfig.api_url, Alarkhabil.#BACKEND_API_UPDATE_TOKEN);
     }
@@ -64,8 +75,73 @@ export class Alarkhabil {
         }
     }
 
-    public createPassphraseCredential(uuid: string, passphrase: string): PassphraseCredential {
+    public async updateSiteConfig(): Promise<void> {
+        await this.fetchSiteConfig();
+    }
+
+    createPassphraseCredential(uuid: string, passphrase: string): PassphraseCredential {
+        if (passphrase.length < 12) {
+            throw new Error('Passphrase too short.');
+        }
         return new PassphraseCredential(uuid, passphrase);
+    }
+
+    #generateAuthToken(): symbol {
+        const now = Date.now();
+        return Symbol(`AUTH_TOKEN_${now}`);
+    }
+
+    /**
+     * Sign in with a passphrase.
+     * @param uuid UUID of the user
+     * @param passphrase passphrase of the user
+     * @returns a temporary auth token symbol, to avoid bringing the credential around.
+     */
+    public async signIn(uuid: string, passphrase: string): Promise<symbol> {
+        const credential = this.createPassphraseCredential(uuid, passphrase);
+        const privateKey = await credential.getBackendAuthPrivateKey();
+        await this.backendApi.account.checkCredentials(privateKey);
+        this.#state.credential = credential;
+        this.#state.authToken = this.#generateAuthToken();
+        return this.#state.authToken;
+    }
+
+    /**
+     * Sign out and clear the credential.
+     */
+    public signOut(): void {
+        this.#state.credential = undefined;
+        this.#state.authToken = this.#generateAuthToken();
+    }
+
+    /**
+     * Convenience method to sign out and reload the page.
+     * TODO: Redirect to the sign-in page.
+     */
+    public signOutAndReload(): void {
+        this.signOut();
+        window.location.reload();
+    }
+
+    public get isSignedIn(): boolean {
+        return this.#state.credential !== undefined;
+    }
+
+    public get accountUuid(): Uuid | undefined {
+        return this.#state.credential?.uuid;
+    }
+
+    public async changePassphrase(oldPassphrase: string, newPassphrase: string): Promise<void> {
+        const uuid = this.accountUuid;
+        if (!uuid) {
+            throw new Error('Not signed in.');
+        }
+        const oldCredential = this.createPassphraseCredential(uuid, oldPassphrase);
+        const oldPrivateKey = await oldCredential.getBackendAuthPrivateKey();
+        const newCredential = this.createPassphraseCredential(uuid, newPassphrase);
+        const newPrivateKey = await newCredential.getBackendAuthPrivateKey();
+        await this.backendApi.account.changeCredentials(oldPrivateKey, newPrivateKey);
+        this.#state.credential = newCredential;
     }
 }
 
