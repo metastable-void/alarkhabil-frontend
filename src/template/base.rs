@@ -23,6 +23,7 @@ pub struct BaseTemplate {
     pub og_image: String, // absolute url
     pub content_html: String,
     pub content_templates: Vec<ContentTemplateItem>,
+    pub site_config_json: String,
 }
 
 impl BaseTemplate {
@@ -57,6 +58,7 @@ impl BaseTemplate {
             og_image,
             content_html: content_html.to_string(),
             content_templates: content_templates().to_owned(),
+            site_config_json: serde_json::to_string(config)?,
         })
     }
 }
