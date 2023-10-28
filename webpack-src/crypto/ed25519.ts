@@ -64,6 +64,12 @@ export class PrivateKey {
         };
     }
 
+    // used for account/change_credentials
+    public async getSignatureForBytes(bytes: Uint8Array): Promise<Uint8Array> {
+        const signature = await ed.signAsync(bytes, this.#privateKey);
+        return signature;
+    }
+
     public async sign<T>(data: T): Promise<Ed25519SignedMessage> {
         const bytes = utf8.encode(JSON.stringify(data));
         return await this.signBytes(bytes);
