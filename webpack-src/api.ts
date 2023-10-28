@@ -1,5 +1,6 @@
 
 import * as urls from './urls';
+import { Ed25519SignedMessage } from './crypto/ed25519';
 
 
 export class ApiResult<T> {
@@ -51,6 +52,11 @@ export class Api {
         const status = response.status;
         const data = await response.json();
         return new ApiResult<Res>(status, data);
+    }
+
+    public async postSigned<Res>(endpointUrl: string, signedMessage: Ed25519SignedMessage, queries?: URLSearchParams | null): Promise<ApiResult<Res>> {
+        Ed25519SignedMessage.verify(signedMessage); // validate
+        return await this.post<Ed25519SignedMessage, Res>(endpointUrl, signedMessage, queries);
     }
 
     public async postEmpty<Res>(endpointUrl: string, queries?: URLSearchParams | null): Promise<ApiResult<Res>> {

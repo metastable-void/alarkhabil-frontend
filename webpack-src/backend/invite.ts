@@ -1,5 +1,6 @@
 
 import { BackendApi } from "../backend-api";
+import { InviteToken } from "../invite-token";
 
 
 interface ResponseInviteNew {
@@ -13,13 +14,13 @@ export class BackendApiInvite {
         this.#backendApi = backendApi;
     }
 
-    public async createNew(inviteMakingToken: string): Promise<string> {
+    public async createNew(inviteMakingToken: string): Promise<InviteToken> {
         const params = new URLSearchParams();
         params.set('token', inviteMakingToken);
         const result = await this.#backendApi.v1.get<ResponseInviteNew>('invite/new', params);
         if (!result.ok) {
             throw new Error(`Failed to create new invite: ${result.status}`);
         }
-        return result.data.invite;
+        return new InviteToken(result.data.invite);
     }
 }
