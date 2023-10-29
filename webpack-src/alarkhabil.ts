@@ -5,6 +5,7 @@ import { BackendApi } from "./backend-api";
 import { deepFreeze } from "./freeze";
 import { PassphraseCredential } from "./passphrase";
 import { Uuid } from "./uuid";
+import { EncryptedStorage } from "./storage/storage";
 
 
 /**
@@ -14,6 +15,7 @@ interface SingletonState {
     siteConfig: SiteConfig;
     authToken: symbol;
     credential: PassphraseCredential | undefined;
+    encryptedStorage: EncryptedStorage | undefined;
 }
 
 /**
@@ -39,6 +41,7 @@ export class Alarkhabil {
             siteConfig: SiteConfig.INITIAL,
             authToken: this.#generateAuthToken(),
             credential: undefined,
+            encryptedStorage: undefined,
         };
         this.frontendApi = new FrontendApi();
         this.backendApi = new BackendApi(this.#state.siteConfig.api_url, Alarkhabil.#BACKEND_API_UPDATE_TOKEN);
@@ -100,9 +103,11 @@ export class Alarkhabil {
     public async signIn(uuid: string, passphrase: string): Promise<symbol> {
         const credential = this.createPassphraseCredential(uuid, passphrase);
         const privateKey = await credential.getBackendAuthPrivateKey();
+        const storageEncryptionKey = await credential.getStorageEncryptionKey();
         await this.backendApi.account.checkCredentials(privateKey);
         this.#state.credential = credential;
         this.#state.authToken = this.#generateAuthToken();
+        this.#state.encryptedStorage = new EncryptedStorage(storageEncryptionKey);
         return this.#state.authToken;
     }
 
@@ -112,6 +117,7 @@ export class Alarkhabil {
     public signOut(): void {
         this.#state.credential = undefined;
         this.#state.authToken = this.#generateAuthToken();
+        this.#state.encryptedStorage = undefined;
     }
 
     /**
@@ -140,8 +146,14 @@ export class Alarkhabil {
         const oldPrivateKey = await oldCredential.getBackendAuthPrivateKey();
         const newCredential = this.createPassphraseCredential(uuid, newPassphrase);
         const newPrivateKey = await newCredential.getBackendAuthPrivateKey();
+        const newStorageEncryptionKey = await newCredential.getStorageEncryptionKey();
         await this.backendApi.account.changeCredentials(oldPrivateKey, newPrivateKey);
         this.#state.credential = newCredential;
+        this.#state.encryptedStorage = new EncryptedStorage(newStorageEncryptionKey);
+    }
+
+    public get encryptedStorage(): EncryptedStorage | undefined {
+        return this.#state.encryptedStorage;
     }
 }
 

@@ -24,6 +24,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "@noble/ed25519": "^2.0.0"
+    "@noble/ed25519": "^2.0.0",
+    "weeg-events": "^0.4.0"
   }
 }

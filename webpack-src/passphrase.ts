@@ -1,6 +1,7 @@
 
 import * as utf8 from './utf8';
 import { PrivateKey } from './crypto/ed25519';
+import { StorageEncryptionKey } from './storage/storage';
 import { Uuid } from './uuid';
 
 
@@ -79,6 +80,11 @@ export class PassphraseCredential {
     public async getBackendAuthPrivateKey(keyIndex = 0): Promise<PrivateKey> {
         const key = await this.#getDerivedKey(PassphraseCredential.KEY_USE_BACKEND_AUTH, keyIndex);
         return new PrivateKey(key);
+    }
+
+    public async getStorageEncryptionKey(keyIndex = 0): Promise<StorageEncryptionKey> {
+        const key = await this.#getDerivedKey(PassphraseCredential.KEY_USE_LOCAL_ENCRYPTION, keyIndex);
+        return new StorageEncryptionKey(key);
     }
 }
 
