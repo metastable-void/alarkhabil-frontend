@@ -323,10 +323,34 @@ export class KeyValueStore<T> {
         });
     }
 
+    public async getAllKeys(): Promise<KeyValueStoreKey[]> {
+        const connection = await SingletonConnection.instance.getIdbConnection();
+        const transaction = connection.transaction('encryptedStorageItems', 'readwrite');
+        const store = transaction.objectStore('encryptedStorageItems');
+        const hashedStoreName = await this.#hashedStoreNamePromise;
+        const encryptionKeyId = await this.#encryptionKeyIdPromise;
+        const index = store.index('encryptionKeyId,hashedStoreName');
+        const request = index.getAll([encryptionKeyId, hashedStoreName]);
+        return await new Promise<KeyValueStoreKey[]>((resolve, reject) => {
+            request.onsuccess = (_event: Event) => {
+                const items = request.result as EncryptedStorageItem[];
+                const decryptionPromises = items.map((item) => {
+                    return this.#encryptionKey.decryptData<KeyValueStoreInternalValue<T>>(STORAGE_ENCRYPTION_KEY_ACCESS_TOKEN, item.data);
+                });
+                Promise.all(decryptionPromises).then((decryptedItems) => {
+                    resolve(decryptedItems.map((item) => item.key));
+                }).catch((e) => reject(e));
+            };
+            request.onerror = (event: Event) => {
+                reject(event);
+            };
+        });
+    }
+
     public async delete(key: KeyValueStoreKey): Promise<void> {
         const encryptionKeyId = await this.#encryptionKeyIdPromise;
         const hashedStoreKey = await this.#encryptionKey.getHashedStoreKey(this.#storeName, key);
-        
+
         const connection = await SingletonConnection.instance.getIdbConnection();
         const transaction = connection.transaction('encryptedStorageItems', 'readwrite');
         const store = transaction.objectStore('encryptedStorageItems');
