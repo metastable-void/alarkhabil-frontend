@@ -6,7 +6,12 @@
     "top_url": "http://localhost:7780",
     "og_image": "/branding/og_image.png",
     "server_timezone": "Asia/Tokyo",
-    "header_navigation": [],
+    "header_navigation": [
+        {
+            "text": "Meta pages",
+            "url": "/meta/"
+        }
+    ],
     "footer_navigation": [
         {
             "text": "Top",
