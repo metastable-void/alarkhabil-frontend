@@ -73,6 +73,22 @@ pub struct ContentMetaPageTemplate {
     pub content_html: String,
 }
 
+#[derive(Template)]
+#[template(path = "content_post_list.html")]
+pub struct ContentPostListTemplate {
+    pub post_list_title: String,
+    pub post_list_html: String,
+}
+
+#[derive(Template)]
+#[template(path = "content_meta_page_list_item.html")]
+pub struct ContentMetaPageListItemTemplate {
+    pub page_name: String,
+    pub title: String,
+    pub date: String,
+    pub date_value: String, // for <time datetime="...">
+}
+
 pub static CONTENT_TEMPLATES: OnceLock<Vec<ContentTemplateItem>> = OnceLock::new();
 
 pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
@@ -85,6 +101,22 @@ pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
                     content_date: "".to_string(),
                     content_date_value: "".to_string(),
                     content_html: "".to_string(),
+                }).unwrap(),
+            ),
+            (
+                "content-post-list".to_string(),
+                ContentPostListTemplate::render(&ContentPostListTemplate {
+                    post_list_title: "".to_string(),
+                    post_list_html: "".to_string(),
+                }).unwrap(),
+            ),
+            (
+                "content-meta-page-list-item".to_string(),
+                ContentMetaPageListItemTemplate::render(&ContentMetaPageListItemTemplate {
+                    page_name: "".to_string(),
+                    title: "".to_string(),
+                    date: "".to_string(),
+                    date_value: "".to_string(),
                 }).unwrap(),
             ),
             ("content-invites".to_string(), include_str!("../../templates/content_invites.html").to_string()),
