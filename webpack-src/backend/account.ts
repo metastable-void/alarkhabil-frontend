@@ -5,6 +5,8 @@ import { InviteToken } from "../invite-token";
 import * as ed25519 from '../crypto/ed25519';
 import * as base64 from '../base64';
 
+import { ResponseAuthorInfo, AuthorDetails } from "./author";
+
 
 interface MsgAccountNew {
     readonly command: 'account_new';
@@ -25,6 +27,12 @@ interface MsgAccountChangeCredentials {
 
 interface MsgAccountDelete {
     readonly command: 'account_delete';
+}
+
+interface MsgSelfUpdate {
+    readonly command: 'self_update';
+    readonly name: string; // displayed name
+    readonly description_text: string; // bio in markdown
 }
 
 interface ResponseAccountNew {
@@ -90,5 +98,24 @@ export class BackendApiAccount {
         if (!result.ok) {
             throw new Error(`Failed to delete account: ${result.status}`);
         }
+    }
+
+    public async updateProfile(privateKey: ed25519.PrivateKey, name: string, markdownDescriptionText: string): Promise<AuthorDetails> {
+        const msg: MsgSelfUpdate = {
+            command: 'self_update',
+            name: name,
+            description_text: markdownDescriptionText,
+        };
+        const signedMessage = await privateKey.sign(msg);
+        const result = await this.#backendApi.v1.postSigned<ResponseAuthorInfo>('self/update', signedMessage);
+        if (!result.ok) {
+            throw new Error(`Failed to update profile: ${result.status}`);
+        }
+        return {
+            uuid: result.data.uuid,
+            name: result.data.name,
+            createdDate: result.data.created_date,
+            descriptionText: result.data.description_text,
+        };
     }
 }

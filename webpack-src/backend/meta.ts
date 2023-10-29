@@ -8,14 +8,14 @@ interface MsgMetaUpdate {
     readonly text: string;
 }
 
-interface ResultMetaInfo {
+interface ResponseMetaInfo {
     readonly page_name: string;
     readonly updated_date: number;
     readonly title: string;
     readonly text: string;
 }
 
-interface ResultMetaSummary {
+interface ResponseMetaSummary {
     readonly page_name: string;
     readonly updated_date: number;
     readonly title: string;
@@ -70,7 +70,7 @@ export class BackendApiMeta {
     public async get(pageName: string): Promise<MetaPageDetails> {
         const params = new URLSearchParams();
         params.set('page_name', pageName);
-        const result = await this.#backendApi.v1.get<ResultMetaInfo>('meta/info', params);
+        const result = await this.#backendApi.v1.get<ResponseMetaInfo>('meta/info', params);
         if (!result.ok) {
             throw new Error(`Failed to get meta: ${result.status}`);
         }
@@ -84,7 +84,7 @@ export class BackendApiMeta {
     }
 
     public async list(): Promise<MetaPageSummary[]> {
-        const result = await this.#backendApi.v1.get<ResultMetaSummary[]>('meta/list');
+        const result = await this.#backendApi.v1.get<ResponseMetaSummary[]>('meta/list');
         if (!result.ok) {
             throw new Error(`Failed to list meta: ${result.status}`);
         }
