@@ -7,6 +7,7 @@ import { BackendApiMeta } from "./backend/meta";
 import { BackendApiAuthor } from "./backend/author";
 import { BackendApiChannel } from "./backend/channel";
 import { BackendApiTag } from "./backend/tag";
+import { BackendApiPost } from "./backend/post";
 
 
 interface BackendApiState {
@@ -23,6 +24,7 @@ export class BackendApi {
     public readonly author: BackendApiAuthor;
     public readonly channel: BackendApiChannel;
     public readonly tag: BackendApiTag;
+    public readonly post: BackendApiPost;
 
     /**
      * Create an instance of BackendApi.
@@ -40,6 +42,7 @@ export class BackendApi {
         this.author = new BackendApiAuthor(this);
         this.channel = new BackendApiChannel(this);
         this.tag = new BackendApiTag(this);
+        this.post = new BackendApiPost(this);
         Object.freeze(this);
     }
 
