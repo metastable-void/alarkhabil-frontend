@@ -23,7 +23,14 @@ use serde::{Serialize, Deserialize};
 
 use crate::error_reporting::result_into_response;
 use crate::config;
-use crate::template::{HtmlTemplate, BaseTemplate, ContentMetaPageTemplate, ContentPostListTemplate, ContentMetaPageListItemTemplate};
+use crate::template::{
+    HtmlTemplate,
+    BaseTemplate,
+    ContentMetaPageTemplate,
+    ContentPostListTemplate,
+    ContentMetaPageListItemTemplate,
+    ContentSingleParagraphMessageTemplate,
+};
 use crate::unix_time::UnixTime;
 use crate::backend_api::BackendApi;
 use crate::markdown;
@@ -161,6 +168,12 @@ pub async fn handler_meta_list(
         
         let meta_pages: Vec<MetaPageListItem> = serde_json::from_slice(&bytes)?;
         let mut html = String::new();
+        if meta_pages.is_empty() {
+            let content_template = ContentSingleParagraphMessageTemplate {
+                message: "There is no page in this list.".to_string(),
+            };
+            html.push_str(&content_template.render()?);
+        }
         for meta_page in meta_pages {
             let updated_date = UnixTime::new(meta_page.updated_date);
             let content_template = ContentMetaPageListItemTemplate {

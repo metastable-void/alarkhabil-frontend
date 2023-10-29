@@ -43,7 +43,7 @@ pub struct NavigationItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ContentTemplateItem {
     pub template_id: String, // template-* id
-    pub html: String, // link text
+    pub html: String, // html source
 }
 
 impl ContentTemplateItem {
@@ -89,6 +89,12 @@ pub struct ContentMetaPageListItemTemplate {
     pub date_value: String, // for <time datetime="...">
 }
 
+#[derive(Template)]
+#[template(path = "content_single_paragraph_message.html")]
+pub struct ContentSingleParagraphMessageTemplate {
+    pub message: String,
+}
+
 pub static CONTENT_TEMPLATES: OnceLock<Vec<ContentTemplateItem>> = OnceLock::new();
 
 pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
@@ -117,6 +123,12 @@ pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
                     title: "".to_string(),
                     date: "".to_string(),
                     date_value: "".to_string(),
+                }).unwrap(),
+            ),
+            (
+                "content-single-paragraph-message".to_string(),
+                ContentSingleParagraphMessageTemplate::render(&ContentSingleParagraphMessageTemplate {
+                    message: "".to_string(),
                 }).unwrap(),
             ),
             ("content-invites".to_string(), include_str!("../../templates/content_invites.html").to_string()),
