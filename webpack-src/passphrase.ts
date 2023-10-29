@@ -1,5 +1,6 @@
 
 import * as utf8 from './utf8';
+import * as hex from './hex';
 import { PrivateKey } from './crypto/ed25519';
 import { StorageEncryptionKey } from './storage/storage';
 import { Uuid } from './uuid';
@@ -53,6 +54,7 @@ const deriveKey = async (key: Uint8Array, keyName: string): Promise<Uint8Array> 
 };
 
 export class PassphraseCredential {
+    public static readonly KEY_USE_PUBLIC_KEY_ID = 'public_key_id'; // this derived key is published as a key id
     public static readonly KEY_USE_BACKEND_AUTH = 'backend_auth';
     public static readonly KEY_USE_LOCAL_ENCRYPTION = 'local_encryption';
 
@@ -85,6 +87,11 @@ export class PassphraseCredential {
     public async getStorageEncryptionKey(keyIndex = 0): Promise<StorageEncryptionKey> {
         const key = await this.#getDerivedKey(PassphraseCredential.KEY_USE_LOCAL_ENCRYPTION, keyIndex);
         return new StorageEncryptionKey(key);
+    }
+
+    public async getKeyId(): Promise<string> {
+        const key = await this.#getDerivedKey(PassphraseCredential.KEY_USE_PUBLIC_KEY_ID, 0);
+        return hex.encode(key);
     }
 }
 

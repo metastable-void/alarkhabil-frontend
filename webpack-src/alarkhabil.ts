@@ -139,10 +139,16 @@ export class Alarkhabil {
 
     public async changePassphrase(oldPassphrase: string, newPassphrase: string): Promise<void> {
         const uuid = this.accountUuid;
-        if (!uuid) {
+        if (!uuid || !this.#state.credential) {
             throw new Error('Not signed in.');
         }
+        const savedKeyId = await this.#state.credential.getKeyId();
         const oldCredential = this.createPassphraseCredential(uuid, oldPassphrase);
+        const oldKeyId = await oldCredential.getKeyId();
+        if (savedKeyId !== oldKeyId) {
+            throw new Error('Incorrect old passphrase.');
+        }
+
         const oldPrivateKey = await oldCredential.getBackendAuthPrivateKey();
         const newCredential = this.createPassphraseCredential(uuid, newPassphrase);
         const newPrivateKey = await newCredential.getBackendAuthPrivateKey();
@@ -150,6 +156,23 @@ export class Alarkhabil {
         await this.backendApi.account.changeCredentials(oldPrivateKey, newPrivateKey);
         this.#state.credential = newCredential;
         this.#state.encryptedStorage = new EncryptedStorage(newStorageEncryptionKey);
+    }
+
+    public async deleteAccountAndSignOut(passphrase: string): Promise<void> {
+        const uuid = this.accountUuid;
+        if (!uuid || !this.#state.credential) {
+            throw new Error('Not signed in.');
+        }
+        const savedKeyId = await this.#state.credential.getKeyId();
+        const credential = this.createPassphraseCredential(uuid, passphrase);
+        const keyId = await credential.getKeyId();
+        if (savedKeyId !== keyId) {
+            throw new Error('Incorrect passphrase.');
+        }
+
+        const privateKey = await credential.getBackendAuthPrivateKey();
+        await this.backendApi.account.delete(privateKey);
+        this.signOut();
     }
 
     public get encryptedStorage(): EncryptedStorage | undefined {
