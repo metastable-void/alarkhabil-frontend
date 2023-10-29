@@ -22,6 +22,9 @@ interface SingletonState {
  * Credentials are not saved on storage on purpose. Page reload will sign out the user.
  */
 export class Alarkhabil {
+    /**
+     * Token used to update backend API URL.
+     */
     static readonly #BACKEND_API_UPDATE_TOKEN: unique symbol = Symbol('BACKEND_API_UPDATE_TOKEN');
 
     static #instance: Alarkhabil | undefined;
@@ -137,7 +140,11 @@ export class Alarkhabil {
         return this.#state.credential?.uuid;
     }
 
-    public async changePassphrase(oldPassphrase: string, newPassphrase: string): Promise<void> {
+    public async changePassphrase(authToken: symbol, oldPassphrase: string, newPassphrase: string): Promise<void> {
+        if (authToken !== this.#state.authToken) {
+            throw new Error('Invalid auth token.');
+        }
+
         const uuid = this.accountUuid;
         if (!uuid || !this.#state.credential) {
             throw new Error('Not signed in.');
@@ -158,7 +165,11 @@ export class Alarkhabil {
         this.#state.encryptedStorage = new EncryptedStorage(newStorageEncryptionKey);
     }
 
-    public async deleteAccountAndSignOut(passphrase: string): Promise<void> {
+    public async deleteAccountAndSignOut(authToken: symbol, passphrase: string): Promise<void> {
+        if (authToken !== this.#state.authToken) {
+            throw new Error('Invalid auth token.');
+        }
+        
         const uuid = this.accountUuid;
         if (!uuid || !this.#state.credential) {
             throw new Error('Not signed in.');
