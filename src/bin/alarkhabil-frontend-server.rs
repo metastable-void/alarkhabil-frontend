@@ -56,6 +56,9 @@ async fn main() -> anyhow::Result<()> {
         // top page
         .route("/", get(handler::handler_root))
 
+        // meta pages
+        .route("/meta/:page_name/", get(handler::handler_meta))
+
         // JavaScript required pages
         .route("/invites/", get(handler::handler_javascript_required))
         .route("/signup/", get(handler::handler_javascript_required))
