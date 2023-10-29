@@ -6,6 +6,7 @@ import { deepFreeze } from "./freeze";
 import { PassphraseCredential } from "./passphrase";
 import { Uuid } from "./uuid";
 import { EncryptedStorage } from "./storage/storage";
+import { InviteToken } from "./invite-token";
 
 
 /**
@@ -111,6 +112,19 @@ export class Alarkhabil {
         this.#state.credential = credential;
         this.#state.authToken = this.#generateAuthToken();
         this.#state.encryptedStorage = new EncryptedStorage(storageEncryptionKey);
+        console.info(`Signed in as ${uuid}.`);
+        return this.#state.authToken;
+    }
+
+    public async signUp(parsedInviteToken: InviteToken, passphrase: string, name: string): Promise<symbol> {
+        const credential = this.createPassphraseCredential(parsedInviteToken.uuid, passphrase);
+        const privateKey = await credential.getBackendAuthPrivateKey();
+        const storageEncryptionKey = await credential.getStorageEncryptionKey();
+        await this.backendApi.account.createNew(privateKey, parsedInviteToken, name);
+        this.#state.credential = credential;
+        this.#state.authToken = this.#generateAuthToken();
+        this.#state.encryptedStorage = new EncryptedStorage(storageEncryptionKey);
+        console.info(`Signed up as ${parsedInviteToken.uuid}.`);
         return this.#state.authToken;
     }
 
@@ -121,6 +135,7 @@ export class Alarkhabil {
         this.#state.credential = undefined;
         this.#state.authToken = this.#generateAuthToken();
         this.#state.encryptedStorage = undefined;
+        console.info('Signed out.');
     }
 
     /**
@@ -163,13 +178,14 @@ export class Alarkhabil {
         await this.backendApi.account.changeCredentials(oldPrivateKey, newPrivateKey);
         this.#state.credential = newCredential;
         this.#state.encryptedStorage = new EncryptedStorage(newStorageEncryptionKey);
+        console.info(`Changed passphrase for ${uuid}.`);
     }
 
     public async deleteAccountAndSignOut(authToken: symbol, passphrase: string): Promise<void> {
         if (authToken !== this.#state.authToken) {
             throw new Error('Invalid auth token.');
         }
-        
+
         const uuid = this.accountUuid;
         if (!uuid || !this.#state.credential) {
             throw new Error('Not signed in.');
@@ -183,6 +199,7 @@ export class Alarkhabil {
 
         const privateKey = await credential.getBackendAuthPrivateKey();
         await this.backendApi.account.delete(privateKey);
+        console.info(`Deleted account ${uuid}.`);
         this.signOut();
     }
 
