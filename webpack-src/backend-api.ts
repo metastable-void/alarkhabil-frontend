@@ -3,6 +3,7 @@ import { Api } from "./api";
 import * as urls from "./urls";
 import { BackendApiInvite } from "./backend/invite";
 import { BackendApiAccount } from "./backend/account";
+import { BackendApiMeta } from "./backend/meta";
 
 
 interface BackendApiState {
@@ -15,6 +16,7 @@ export class BackendApi {
 
     public readonly invite: BackendApiInvite;
     public readonly account: BackendApiAccount;
+    public readonly meta: BackendApiMeta;
 
     /**
      * Create an instance of BackendApi.
@@ -28,6 +30,7 @@ export class BackendApi {
         this.#urlUpdateToken = urlUpdateToken ?? Symbol('TOKEN_NONE');
         this.invite = new BackendApiInvite(this);
         this.account = new BackendApiAccount(this);
+        this.meta = new BackendApiMeta(this);
         Object.freeze(this);
     }
 
