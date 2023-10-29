@@ -4,6 +4,7 @@ import { InviteToken } from "../invite-token";
 
 import * as ed25519 from '../crypto/ed25519';
 import * as base64 from '../base64';
+import { Uuid } from "../uuid";
 
 import { ResponseAuthorInfo, AuthorDetails } from "./author";
 
@@ -112,7 +113,7 @@ export class BackendApiAccount {
             throw new Error(`Failed to update profile: ${result.status}`);
         }
         return {
-            uuid: result.data.uuid,
+            uuid: Uuid(result.data.uuid),
             name: result.data.name,
             createdDate: result.data.created_date,
             descriptionText: result.data.description_text,

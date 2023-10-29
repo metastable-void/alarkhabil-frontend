@@ -1,5 +1,6 @@
 
 import { BackendApi } from "../backend-api";
+import { DnsToken } from "../dns-token";
 
 
 interface MsgMetaUpdate {
@@ -21,15 +22,18 @@ interface ResponseMetaSummary {
     readonly title: string;
 }
 
+
+// frontend types
+
 export interface MetaPageDetails {
-    readonly pageName: string;
+    readonly pageName: DnsToken;
     readonly updatedDate: number;
     readonly title: string;
     readonly text: string;
 }
 
 export interface MetaPageSummary {
-    readonly pageName: string;
+    readonly pageName: DnsToken;
     readonly updatedDate: number;
     readonly title: string;
 }
@@ -44,7 +48,7 @@ export class BackendApiMeta {
         this.#backendApi = backendApi;
     }
 
-    public async adminUpdate(adminToken: string, pageName: string, title: string, markdownText: string): Promise<void> {
+    public async adminUpdate(adminToken: string, pageName: DnsToken, title: string, markdownText: string): Promise<void> {
         const params = new URLSearchParams();
         params.set('token', adminToken);
         const result = await this.#backendApi.v1.post<MsgMetaUpdate, unknown>('admin/meta/update', {
@@ -57,7 +61,7 @@ export class BackendApiMeta {
         }
     }
 
-    public async adminDelete(adminToken: string, pageName: string): Promise<void> {
+    public async adminDelete(adminToken: string, pageName: DnsToken): Promise<void> {
         const params = new URLSearchParams();
         params.set('token', adminToken);
         params.set('page_name', pageName);
@@ -67,7 +71,7 @@ export class BackendApiMeta {
         }
     }
 
-    public async get(pageName: string): Promise<MetaPageDetails> {
+    public async get(pageName: DnsToken): Promise<MetaPageDetails> {
         const params = new URLSearchParams();
         params.set('page_name', pageName);
         const result = await this.#backendApi.v1.get<ResponseMetaInfo>('meta/info', params);
@@ -76,7 +80,7 @@ export class BackendApiMeta {
         }
         const info = result.data;
         return {
-            pageName: info.page_name,
+            pageName: DnsToken(info.page_name),
             updatedDate: info.updated_date,
             title: info.title,
             text: info.text,
@@ -90,7 +94,7 @@ export class BackendApiMeta {
         }
         return result.data.map((info) => {
             return {
-                pageName: info.page_name,
+                pageName: DnsToken(info.page_name),
                 updatedDate: info.updated_date,
                 title: info.title,
             };

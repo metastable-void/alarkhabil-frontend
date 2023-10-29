@@ -21,14 +21,14 @@ export interface ResponseAuthorSummary {
 // Types for frontend use
 
 export interface AuthorDetails {
-    readonly uuid: string;
+    readonly uuid: Uuid;
     readonly name: string;
     readonly createdDate: number; // unix timestamp in seconds
     readonly descriptionText: string; // Markdown text
 }
 
 export interface AuthorSummary {
-    readonly uuid: string;
+    readonly uuid: Uuid;
     readonly name: string;
 }
 
@@ -44,10 +44,10 @@ export class BackendApiAuthor {
         params.set('uuid', uuid);
         const result = await this.#backendApi.v1.get<ResponseAuthorInfo>('author/info', params);
         if (!result.ok) {
-            throw new Error(`Failed to get account: ${result.status}`);
+            throw new Error(`Failed to get author: ${result.status}`);
         }
         return {
-            uuid: result.data.uuid,
+            uuid: Uuid(result.data.uuid),
             name: result.data.name,
             createdDate: result.data.created_date,
             descriptionText: result.data.description_text,
@@ -57,11 +57,26 @@ export class BackendApiAuthor {
     public async list(): Promise<AuthorSummary[]> {
         const result = await this.#backendApi.v1.get<ResponseAuthorSummary[]>('author/list');
         if (!result.ok) {
-            throw new Error(`Failed to list accounts: ${result.status}`);
+            throw new Error(`Failed to list authors: ${result.status}`);
         }
         return result.data.map((author) => {
             return {
-                uuid: author.uuid,
+                uuid: Uuid(author.uuid),
+                name: author.name,
+            };
+        });
+    }
+
+    public async listByChannel(channelUuid: Uuid): Promise<AuthorSummary[]> {
+        const params = new URLSearchParams();
+        params.set('uuid', channelUuid);
+        const result = await this.#backendApi.v1.get<ResponseAuthorSummary[]>('channel/authors', params);
+        if (!result.ok) {
+            throw new Error(`Failed to list authors: ${result.status}`);
+        }
+        return result.data.map((author) => {
+            return {
+                uuid: Uuid(author.uuid),
                 name: author.name,
             };
         });

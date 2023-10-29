@@ -5,6 +5,7 @@ import { BackendApiInvite } from "./backend/invite";
 import { BackendApiAccount } from "./backend/account";
 import { BackendApiMeta } from "./backend/meta";
 import { BackendApiAuthor } from "./backend/author";
+import { BackendApiChannel } from "./backend/channel";
 
 
 interface BackendApiState {
@@ -19,6 +20,7 @@ export class BackendApi {
     public readonly account: BackendApiAccount;
     public readonly meta: BackendApiMeta;
     public readonly author: BackendApiAuthor;
+    public readonly channel: BackendApiChannel;
 
     /**
      * Create an instance of BackendApi.
@@ -34,6 +36,7 @@ export class BackendApi {
         this.account = new BackendApiAccount(this);
         this.meta = new BackendApiMeta(this);
         this.author = new BackendApiAuthor(this);
+        this.channel = new BackendApiChannel(this);
         Object.freeze(this);
     }
 
