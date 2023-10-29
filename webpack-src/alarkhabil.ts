@@ -93,6 +93,10 @@ export class Alarkhabil {
         return new PassphraseCredential(uuid, passphrase);
     }
 
+    public parseInviteToken(token: string): InviteToken {
+        return new InviteToken(token);
+    }
+
     #generateAuthToken(): symbol {
         const now = Date.now();
         return Symbol(`AUTH_TOKEN_${now}`);
