@@ -141,3 +141,14 @@ body {
   column-gap: 2em;
   row-gap: 1em;
 }
+
+.template-content-tag-list-item {
+  display: inline-block;
+  margin-inline: 1em;
+}
+
+.template-content-tag-list-item > a {
+  display: inline-block;
+  padding-inline: .5em;
+  padding-block: .125em;
+}

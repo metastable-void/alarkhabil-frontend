@@ -75,3 +75,9 @@ a:hover {
 .post-author .post-author-uuid::after {
   content: ')';
 }
+
+.template-content-tag-list-item > a {
+  background-color: var(--accent-color);
+  color: #fff;
+  border-radius: .5rem;
+}
