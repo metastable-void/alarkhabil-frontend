@@ -18,8 +18,20 @@
             "url": "/"
         },
         {
-            "text": "Menhera.org",
-            "url": "https://www.menhera.org/"
+            "text": "Meta pages",
+            "url": "/meta/"
+        },
+        {
+            "text": "Channels",
+            "url": "/c/"
+        },
+        {
+            "text": "Authors",
+            "url": "/authors/"
+        },
+        {
+            "text": "Tags",
+            "url": "/tags/"
         }
     ]
 }
