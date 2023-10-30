@@ -112,6 +112,8 @@ Object.freeze(RouteParams.prototype);
 
 export type RouteHandler = (params: RouteParams) => void;
 
+export type ErrorRouteHandler = (params: RouteParams, error: unknown) => void;
+
 export type Route = {
     readonly parsedRoute: ParsedRoute;
     readonly handler: RouteHandler;
@@ -146,6 +148,7 @@ export class Router {
         readonly #routes: Route[] = [];
         readonly #routeIdSet: Set<string> = new Set();
         #fallbackHandler: RouteHandler | null = null;
+        #errorHandler: ErrorRouteHandler | null = null;
     
         public add(pattern: string, handler: RouteHandler): Builder {
             const parsedRoute = ParsedRoute(pattern);
@@ -171,18 +174,31 @@ export class Router {
             this.#fallbackHandler = handler;
             return this;
         }
+
+        public setErrorHandler(handler: ErrorRouteHandler): Builder {
+            if (typeof this.#errorHandler === 'function') {
+                throw new Error('Error handler is already set.');
+            }
+            if (typeof handler !== 'function') {
+                throw new Error('Error handler must be a function.');
+            }
+            this.#errorHandler = handler;
+            return this;
+        }
     
         public build(): Router {
-            return new Router(Route.sort(this.#routes), this.#fallbackHandler);
+            return new Router(Route.sort(this.#routes), this.#fallbackHandler, this.#errorHandler);
         }
     };
 
     readonly #routes: readonly Route[];
     readonly #fallbackHandler: RouteHandler | null;
+    readonly #errorHandler: ErrorRouteHandler | null;
 
-    private constructor(routes: readonly Route[], fallbackHandler: RouteHandler | null = null) {
+    private constructor(routes: readonly Route[], fallbackHandler: RouteHandler | null = null, errorHandler: ErrorRouteHandler | null = null) {
         this.#routes = routes;
         this.#fallbackHandler = fallbackHandler;
+        this.#errorHandler = errorHandler;
         Object.freeze(this);
     }
 
@@ -234,11 +250,35 @@ export class Router {
     }
 
     #callHandler(handler: RouteHandler, params: RouteParams): void {
-        const promise = Promise.resolve(handler(params)); // throws if synchronously throws
-        // if async, catch the error and log it
-        promise.catch((e) => {
-            console.error('Route handler asynchronously throwed:', e);
-        });
+        try {
+            const promise = Promise.resolve(handler(params)); // throws if synchronously throws
+            // if async, catch the error and log it
+            promise.catch((e) => {
+                console.error('Route handler asynchronously throwed:', e);
+                if (this.#errorHandler != null) {
+                    this.#callErrorHandler(this.#errorHandler, params, e);
+                }
+            });
+        } catch (e) {
+            console.error('Route handler synchronously throwed:', e);
+            if (this.#errorHandler != null) {
+                this.#callErrorHandler(this.#errorHandler, params, e);
+            } else {
+                throw e;
+            }
+        }
+    }
+    
+    #callErrorHandler(handler: ErrorRouteHandler, params: RouteParams, error: unknown): void {
+        try {
+            const promise = Promise.resolve(handler(params, error)); // throws if synchronously throws
+            // if async, catch the error and log it
+            promise.catch((e) => {
+                console.error('Error route handler asynchronously throwed:', e);
+            });
+        } catch (e) {
+            console.error('Error route handler synchronously throwed:', e);
+        }
     }
 
     public handle(pathname: string, search: string): void {
