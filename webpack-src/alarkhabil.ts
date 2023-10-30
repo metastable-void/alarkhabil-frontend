@@ -7,6 +7,7 @@ import { PassphraseCredential } from "./passphrase";
 import { Uuid } from "./uuid";
 import { EncryptedStorage } from "./storage/storage";
 import { InviteToken } from "./invite-token";
+import { PageMetadata } from "./page-metadata";
 
 
 /**
@@ -34,6 +35,8 @@ export class Alarkhabil {
 
     public readonly frontendApi: FrontendApi;
     public readonly backendApi: BackendApi;
+
+    public readonly pageMetadata = PageMetadata;
 
     public constructor() {
         if (new.target !== Alarkhabil) {
