@@ -34,6 +34,14 @@ routerBuilder.setErrorHandler(errorHandler);
 
 const router = routerBuilder.build();
 
+// routes not prerendered by the server
+const JS_HANDLED_PATHNAMES: string[] = [
+    '/invites/',
+    '/signup/',
+    '/signin/',
+    '/account/',
+];
+
 const navigate = (url: string) => {
     const parsedUrl = new URL(url, document.location.href);
     if (parsedUrl.origin !== document.location.origin) {
@@ -67,3 +75,7 @@ document.addEventListener ('click', ev => {
         return;
     }
 });
+
+if (JS_HANDLED_PATHNAMES.includes(document.location.pathname)) {
+    router.handle(document.location.pathname, document.location.search);
+}
