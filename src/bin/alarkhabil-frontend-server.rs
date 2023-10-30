@@ -60,6 +60,9 @@ async fn main() -> anyhow::Result<()> {
         .route("/meta/", get(handler::handler_meta_list))
         .route("/meta/:page_name/", get(handler::handler_meta))
 
+        // channels
+        .route("/c/", get(handler::handler_channel_list))
+
         // JavaScript required pages
         .route("/invites/", get(handler::handler_javascript_required))
         .route("/signup/", get(handler::handler_javascript_required))

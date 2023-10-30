@@ -31,6 +31,7 @@ use crate::template::{
     ContentMetaPageListItemTemplate,
     ContentSingleParagraphMessageTemplate,
     ContentPostListItemTemplate,
+    ContentChannelListItemTemplate,
 };
 use crate::unix_time::UnixTime;
 use crate::backend_api::BackendApi;
@@ -245,6 +246,59 @@ pub async fn handler_meta_list(
         let template = BaseTemplate::try_new(
             &url,
             Some("Meta Pages"),
+            &content_template.render()?,
+            &config,
+        )?;
+
+        Ok(HtmlTemplate(template).into_response())
+    }).await
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ChannelListItem {
+    uuid: String,
+    handle: String,
+    name: String,
+    lang: String,
+}
+
+pub async fn handler_channel_list(
+    request: Request<Body>,
+) -> impl IntoResponse {
+    result_into_response(async move {
+        let config = config::load_config().await;
+        let url = request.uri().path().to_string();
+
+        let query = HashMap::new();
+
+        let backend_api = BackendApi::new_v1(&config);
+        let bytes = backend_api.get_bytes("channel/list", query).await?;
+        
+        let channels: Vec<ChannelListItem> = serde_json::from_slice(&bytes)?;
+        let mut html = String::new();
+        if channels.is_empty() {
+            let content_template = ContentSingleParagraphMessageTemplate {
+                message: "There is no channel in this list.".to_string(),
+            };
+            html.push_str(&content_template.render()?);
+        }
+        for channel in channels {
+            let content_template = ContentChannelListItemTemplate {
+                channel_handle: channel.handle.clone(),
+                channel_name: channel.name.clone(),
+                channel_lang: channel.lang.clone(),
+            };
+            html.push_str(&content_template.render()?);
+        }
+
+        let content_template = ContentPostListTemplate {
+            post_list_title: "Channels".to_string(),
+            post_list_html: html,
+        };
+
+        let template = BaseTemplate::try_new(
+            &url,
+            Some("Channels"),
             &content_template.render()?,
             &config,
         )?;

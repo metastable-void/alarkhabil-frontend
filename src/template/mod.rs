@@ -109,6 +109,14 @@ pub struct ContentPostListItemTemplate {
     pub channel_lang: String,
 }
 
+#[derive(Template)]
+#[template(path = "content_channel_list_item.html")]
+pub struct ContentChannelListItemTemplate {
+    pub channel_handle: String,
+    pub channel_name: String,
+    pub channel_lang: String,
+}
+
 pub static CONTENT_TEMPLATES: OnceLock<Vec<ContentTemplateItem>> = OnceLock::new();
 
 pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
@@ -154,6 +162,14 @@ pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
                     date_value: "".to_string(),
                     author_uuid: "".to_string(),
                     author_name: "".to_string(),
+                    channel_handle: "".to_string(),
+                    channel_name: "".to_string(),
+                    channel_lang: "".to_string(),
+                }).unwrap(),
+            ),
+            (
+                "content-channel-list-item".to_string(),
+                ContentChannelListItemTemplate::render(&ContentChannelListItemTemplate {
                     channel_handle: "".to_string(),
                     channel_name: "".to_string(),
                     channel_lang: "".to_string(),
