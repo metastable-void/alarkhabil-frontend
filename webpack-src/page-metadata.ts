@@ -30,6 +30,41 @@ export class PageMetadata {
     public static set documentTitle(value: string) {
         document.title = value;
     }
+
+    private static getOgTag(property: string): HTMLMetaElement {
+        const tag = document.querySelector<HTMLMetaElement>(`meta[property="og:${property}"]`);
+        if (!tag) {
+            const tag = document.createElement('meta');
+            tag.setAttribute('property', `og:${property}`);
+            document.head.appendChild(tag);
+            return tag;
+        }
+        return tag;
+    }
+
+    public static get ogUrl(): string {
+        return PageMetadata.getOgTag('url').content;
+    }
+
+    public static set ogUrl(value: string) {
+        PageMetadata.getOgTag('url').content = value;
+    }
+
+    public static get ogTitle(): string {
+        return PageMetadata.getOgTag('title').content;
+    }
+
+    public static set ogTitle(value: string) {
+        PageMetadata.getOgTag('title').content = value;
+    }
+
+    public static get ogSiteName(): string {
+        return PageMetadata.getOgTag('site_name').content;
+    }
+
+    public static set ogSiteName(value: string) {
+        PageMetadata.getOgTag('site_name').content = value;
+    }
 }
 
 Object.freeze(PageMetadata);
