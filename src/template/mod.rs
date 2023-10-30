@@ -144,6 +144,24 @@ pub struct ContentPostTemplate {
     pub content_html: String,
 }
 
+#[derive(Template)]
+#[template(path = "content_author_list_item.html")]
+pub struct ContentAuthorListItemTemplate {
+    pub author_uuid: String,
+    pub author_name: String,
+}
+
+#[derive(Template)]
+#[template(path = "content_author.html")]
+pub struct ContentAuthorTemplate {
+    pub author_uuid: String,
+    pub author_name: String,
+    pub author_date: String,
+    pub author_date_value: String, // for <time datetime="...">
+    pub author_description_html: String,
+    pub post_list_html: String,
+}
+
 // for use by JavaScript rendering
 pub static CONTENT_TEMPLATES: OnceLock<Vec<ContentTemplateItem>> = OnceLock::new();
 
@@ -228,6 +246,24 @@ pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
                     channel_name: "".to_string(),
                     channel_lang: "".to_string(),
                     content_html: "".to_string(),
+                }).unwrap(),
+            ),
+            (
+                "content-author-list-item".to_string(),
+                ContentAuthorListItemTemplate::render(&ContentAuthorListItemTemplate {
+                    author_uuid: "".to_string(),
+                    author_name: "".to_string(),
+                }).unwrap(),
+            ),
+            (
+                "content-author".to_string(),
+                ContentAuthorTemplate::render(&ContentAuthorTemplate {
+                    author_uuid: "".to_string(),
+                    author_name: "".to_string(),
+                    author_date: "".to_string(),
+                    author_date_value: "".to_string(),
+                    author_description_html: "".to_string(),
+                    post_list_html: "".to_string(),
                 }).unwrap(),
             ),
             ("content-invites".to_string(), include_str!("../../templates/content_invites.html").to_string()),

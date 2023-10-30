@@ -34,6 +34,8 @@ use crate::template::{
     ContentChannelListItemTemplate,
     ContentChannelTemplate,
     ContentPostTemplate,
+    ContentAuthorListItemTemplate,
+    ContentAuthorTemplate,
 };
 use crate::unix_time::UnixTime;
 use crate::backend_api::BackendApi;
@@ -84,6 +86,14 @@ pub struct PostInfo {
     pub title: String,
     pub revision_text: String,
     pub author: AuthorSummary,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AuthorInfo {
+    pub uuid: String,
+    pub name: String,
+    pub created_date: u64,
+    pub description_text: String,
 }
 
 pub async fn handler_root(request: Request<Body>) -> impl IntoResponse {
@@ -430,6 +440,117 @@ pub async fn handler_post(
         let template = BaseTemplate::try_new(
             &url,
             Some(post.title.as_str()),
+            &content_template.render()?,
+            &config,
+        )?;
+
+        Ok(HtmlTemplate(template).into_response())
+    }).await
+}
+
+pub async fn handler_author_list(
+    request: Request<Body>,
+) -> impl IntoResponse {
+    result_into_response(async move {
+        let config = config::load_config().await;
+        let url = request.uri().path().to_string();
+
+        let query = HashMap::new();
+
+        let backend_api = BackendApi::new_v1(&config);
+        let bytes = backend_api.get_bytes("author/list", query).await?;
+        
+        let authors: Vec<AuthorSummary> = serde_json::from_slice(&bytes)?;
+        let mut html = String::new();
+        if authors.is_empty() {
+            let content_template = ContentSingleParagraphMessageTemplate {
+                message: "There is no author in this list.".to_string(),
+            };
+            html.push_str(&content_template.render()?);
+        }
+        for author in authors {
+            let content_template = ContentAuthorListItemTemplate {
+                author_uuid: author.uuid.clone(),
+                author_name: author.name.clone(),
+            };
+            html.push_str(&content_template.render()?);
+        }
+
+        let content_template = ContentPostListTemplate {
+            post_list_title: "Authors".to_string(),
+            post_list_html: html,
+        };
+
+        let template = BaseTemplate::try_new(
+            &url,
+            Some("Authors"),
+            &content_template.render()?,
+            &config,
+        )?;
+
+        Ok(HtmlTemplate(template).into_response())
+    }).await
+}
+
+pub async fn handler_author(
+    Path(author_uuid): Path<String>,
+    request: Request<Body>,
+) -> impl IntoResponse {
+    result_into_response(async move {
+        let config = config::load_config().await;
+        let url = request.uri().path().to_string();
+
+        let mut query = HashMap::new();
+        query.insert("uuid".to_string(), author_uuid);
+        let backend_api = BackendApi::new_v1(&config);
+        let bytes =  if let Ok(bytes) = backend_api.get_bytes("author/info", query).await {
+            bytes
+        } else {
+            return Ok(handler_404(request).await.into_response());
+        };
+        let author: AuthorInfo = serde_json::from_slice(&bytes)?;
+
+        let mut query = HashMap::new();
+        query.insert("uuid".to_string(), (&author.uuid).to_string());
+        let bytes = backend_api.get_bytes("author/posts", query).await?;
+        let posts: Vec<PostSummary> = serde_json::from_slice(&bytes)?;
+        
+        let mut html = String::new();
+        if posts.is_empty() {
+            let content_template = ContentSingleParagraphMessageTemplate {
+                message: "There is no post in this list.".to_string(),
+            };
+            html.push_str(&content_template.render()?);
+        }
+        for post in &posts {
+            let updated_date = UnixTime::new(post.revision_date);
+            let channel = post.channel.clone().unwrap();
+            let content_template = ContentPostListItemTemplate {
+                post_uuid: post.post_uuid.clone(),
+                title: post.title.clone(),
+                date: updated_date.default_format_in_timezone(config.server_timezone()),
+                date_value: updated_date.to_utc_datetime_string(),
+                channel_handle: channel.handle.clone(),
+                channel_name: channel.name.clone(),
+                channel_lang: channel.lang.clone(),
+                author_name: author.name.clone(),
+                author_uuid: author.uuid.clone(),
+            };
+            html.push_str(&content_template.render()?);
+        }
+
+        let content_template = ContentAuthorTemplate {
+            author_uuid: author.uuid.clone(),
+            author_name: author.name.clone(),
+            author_description_html: markdown::to_html(&author.description_text),
+            author_date: UnixTime::new(author.created_date).default_format_in_timezone(config.server_timezone()),
+            author_date_value: UnixTime::new(author.created_date).to_utc_datetime_string(),
+            post_list_html: html,
+        };
+
+        let template = BaseTemplate::try_new(
+            &url,
+            Some(author.name.as_str()),
             &content_template.render()?,
             &config,
         )?;

@@ -67,6 +67,10 @@ async fn main() -> anyhow::Result<()> {
         // post
         .route("/c/:channel_handle/:post_uuid/", get(handler::handler_post))
 
+        // authors
+        .route("/authors/", get(handler::handler_author_list))
+        .route("/authors/:author_uuid/", get(handler::handler_author))
+
         // JavaScript required pages
         .route("/invites/", get(handler::handler_javascript_required))
         .route("/signup/", get(handler::handler_javascript_required))

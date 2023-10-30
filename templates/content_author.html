@@ -1,0 +1,16 @@
+<div class="template-content template-content-author">
+    <div class="breadcrumbs">
+        <a href="/authors/">Authors</a> &gt; <strong>{{ author_name }}</strong>
+    </div>
+    <header class="author-header">
+        <h1 class="author-heading"><span class="author-name">{{ author_name }}</span></h1>
+        <p class="author-date"><time datetime="{{ author_date_value }}">{{ author_date }}</time></p>
+        <div class="author-description">{{ author_description_html|safe }}</div>
+    </header>
+    <div class="author-posts">
+        <h2 class="author-posts-heading">Posts</h2>
+        <div class="author-posts-items">
+{{ post_list_html|safe }}
+        </div>
+    </div>
+</div>
