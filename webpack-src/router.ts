@@ -149,8 +149,12 @@ export class Router {
         readonly #routeIdSet: Set<string> = new Set();
         #fallbackHandler: RouteHandler | null = null;
         #errorHandler: ErrorRouteHandler | null = null;
+        #frozen = false;
     
         public add(pattern: string, handler: RouteHandler): Builder {
+            if (this.#frozen) {
+                throw new Error('Router builder is frozen.');
+            }
             const parsedRoute = ParsedRoute(pattern);
             const routeId = ParsedRoute.getIdentifier(parsedRoute);
             if (this.#routeIdSet.has(routeId)) {
@@ -165,6 +169,9 @@ export class Router {
         }
 
         public setFallbackHandler(handler: RouteHandler): Builder {
+            if (this.#frozen) {
+                throw new Error('Router builder is frozen.');
+            }
             if (typeof this.#fallbackHandler === 'function') {
                 throw new Error('Fallback handler is already set.');
             }
@@ -176,6 +183,9 @@ export class Router {
         }
 
         public setErrorHandler(handler: ErrorRouteHandler): Builder {
+            if (this.#frozen) {
+                throw new Error('Router builder is frozen.');
+            }
             if (typeof this.#errorHandler === 'function') {
                 throw new Error('Error handler is already set.');
             }
@@ -187,6 +197,7 @@ export class Router {
         }
     
         public build(): Router {
+            this.#frozen = true;
             return new Router(Route.sort(this.#routes), this.#fallbackHandler, this.#errorHandler);
         }
     };

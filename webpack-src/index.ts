@@ -3,7 +3,7 @@ import { Router, RouteHandler, ErrorRouteHandler, RouteParams } from './router';
 import { PageMetadata } from './page-metadata';
 import './alarkhabil';
 
-const builder: Router.Builder = new Router.Builder();
+const routerBuilder: Router.Builder = new Router.Builder();
 
 const commonHandler = (params: RouteParams, isError: boolean, title = '') => {
     if (isError) {
@@ -29,5 +29,7 @@ const errorHandler: ErrorRouteHandler = (params, error) => {
     commonHandler(params, true, 'Error');
 };
 
-builder.setFallbackHandler(handlerNotFound);
-builder.setErrorHandler(errorHandler);
+routerBuilder.setFallbackHandler(handlerNotFound);
+routerBuilder.setErrorHandler(errorHandler);
+
+const router = routerBuilder.build();
