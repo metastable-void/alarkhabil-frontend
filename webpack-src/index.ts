@@ -18,7 +18,7 @@ const commonHandler = (params: RouteParams, isError: boolean, title = '') => {
     PageMetadata.documentTitle = documentTitle;
     const url = new URL(params.matchedPath, document.location.href);
     PageMetadata.ogUrl = url.href;
-    
+    PageMetadata.ogTitle = ogTitle;
 };
 
 const handlerNotFound: RouteHandler = (params) => {
