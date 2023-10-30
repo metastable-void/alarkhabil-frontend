@@ -12,6 +12,9 @@
                 <span class="post-author-uuid">{{ author_uuid }}</span>
             </a>
         </div>
+        <div class="post-tags">
+{{ tag_list_html|safe }}
+        </div>
     </header>
     <div class="post-body">
 {{ content_html|safe }}

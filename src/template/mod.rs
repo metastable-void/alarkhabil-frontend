@@ -141,6 +141,7 @@ pub struct ContentPostTemplate {
     pub channel_handle: String,
     pub channel_name: String,
     pub channel_lang: String,
+    pub tag_list_html: String,
     pub content_html: String,
 }
 
@@ -261,6 +262,7 @@ pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
                     channel_handle: "".to_string(),
                     channel_name: "".to_string(),
                     channel_lang: "".to_string(),
+                    tag_list_html: "".to_string(),
                     content_html: "".to_string(),
                 }).unwrap(),
             ),

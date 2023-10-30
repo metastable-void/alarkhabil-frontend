@@ -424,6 +424,11 @@ pub async fn handler_post(
             return Ok(handler_404(request).await.into_response());
         }
 
+        let tag_html_list = post.tags.iter().map(|tag_name| {
+            let content_template = ContentTagListItemTemplate::new(tag_name);
+            content_template.render()
+        }).collect::<Result<Vec<String>, askama::Error>>()?.join("\n");
+
         let updated_date = UnixTime::new(post.revision_date);
         let content_template = ContentPostTemplate {
             post_uuid: post.post_uuid.clone(),
@@ -436,6 +441,7 @@ pub async fn handler_post(
             content_html: markdown::to_html(&post.revision_text),
             author_uuid: post.author.uuid.clone(),
             author_name: post.author.name.clone(),
+            tag_list_html: tag_html_list,
         };
 
         let template = BaseTemplate::try_new(
