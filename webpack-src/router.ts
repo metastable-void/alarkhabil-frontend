@@ -237,7 +237,7 @@ export class Router {
         const promise = Promise.resolve(handler(params)); // throws if synchronously throws
         // if async, catch the error and log it
         promise.catch((e) => {
-            console.error(e);
+            console.error('Route handler asynchronously throwed:', e);
         });
     }
 
