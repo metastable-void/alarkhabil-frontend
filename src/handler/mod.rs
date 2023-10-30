@@ -32,6 +32,7 @@ use crate::template::{
     ContentSingleParagraphMessageTemplate,
     ContentPostListItemTemplate,
     ContentChannelListItemTemplate,
+    ContentChannelTemplate,
 };
 use crate::unix_time::UnixTime;
 use crate::backend_api::BackendApi;
@@ -60,6 +61,16 @@ pub struct PostSummary {
     pub title: String,
     pub author: Option<AuthorSummary>,
     pub channel: Option<ChannelSummary>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChannelInfo {
+    uuid: String,
+    handle: String,
+    name: String,
+    created_date: u64,
+    lang: String,
+    description_text: String,
 }
 
 pub async fn handler_root(request: Request<Body>) -> impl IntoResponse {
@@ -291,6 +302,70 @@ pub async fn handler_channel_list(
         let template = BaseTemplate::try_new(
             &url,
             Some("Channels"),
+            &content_template.render()?,
+            &config,
+        )?;
+
+        Ok(HtmlTemplate(template).into_response())
+    }).await
+}
+
+pub async fn handler_channel(
+    Path(channel_handle): Path<String>,
+    request: Request<Body>,
+) -> impl IntoResponse {
+    result_into_response(async move {
+        let config = config::load_config().await;
+        let url = request.uri().path().to_string();
+
+        let mut query = HashMap::new();
+        query.insert("handle".to_string(), channel_handle);
+        let backend_api = BackendApi::new_v1(&config);
+        let bytes = backend_api.get_bytes("channel/info", query).await?;
+        let channel: ChannelInfo = serde_json::from_slice(&bytes)?;
+
+        let mut query = HashMap::new();
+        query.insert("uuid".to_string(), (&channel.uuid).to_string());
+        let bytes = backend_api.get_bytes("channel/posts", query).await?;
+        let posts: Vec<PostSummary> = serde_json::from_slice(&bytes)?;
+        
+        let mut html = String::new();
+        if posts.is_empty() {
+            let content_template = ContentSingleParagraphMessageTemplate {
+                message: "There is no channel in this list.".to_string(),
+            };
+            html.push_str(&content_template.render()?);
+        }
+        for post in &posts {
+            let updated_date = UnixTime::new(post.revision_date);
+            let author = post.author.clone().unwrap();
+            let content_template = ContentPostListItemTemplate {
+                post_uuid: post.post_uuid.clone(),
+                title: post.title.clone(),
+                date: updated_date.default_format_in_timezone(config.server_timezone()),
+                date_value: updated_date.to_utc_datetime_string(),
+                channel_handle: channel.handle.clone(),
+                channel_name: channel.name.clone(),
+                channel_lang: channel.lang.clone(),
+                author_name: author.name.clone(),
+                author_uuid: author.uuid.clone(),
+            };
+            html.push_str(&content_template.render()?);
+        }
+
+        let content_template = ContentChannelTemplate {
+            channel_handle: channel.handle.clone(),
+            channel_name: channel.name.clone(),
+            channel_lang: channel.lang.clone(),
+            channel_description_html: markdown::to_html(&channel.description_text),
+            channel_date: UnixTime::new(channel.created_date).default_format_in_timezone(config.server_timezone()),
+            channel_date_value: UnixTime::new(channel.created_date).to_utc_datetime_string(),
+            post_list_html: html,
+        };
+
+        let template = BaseTemplate::try_new(
+            &url,
+            Some(channel.name.as_str()),
             &content_template.render()?,
             &config,
         )?;

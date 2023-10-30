@@ -117,6 +117,19 @@ pub struct ContentChannelListItemTemplate {
     pub channel_lang: String,
 }
 
+#[derive(Template)]
+#[template(path = "content_channel.html")]
+pub struct ContentChannelTemplate {
+    pub channel_handle: String,
+    pub channel_name: String,
+    pub channel_lang: String,
+    pub channel_description_html: String,
+    pub channel_date: String,
+    pub channel_date_value: String, // for <time datetime="...">
+    pub post_list_html: String,
+}
+
+// for use by JavaScript rendering
 pub static CONTENT_TEMPLATES: OnceLock<Vec<ContentTemplateItem>> = OnceLock::new();
 
 pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
@@ -173,6 +186,18 @@ pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
                     channel_handle: "".to_string(),
                     channel_name: "".to_string(),
                     channel_lang: "".to_string(),
+                }).unwrap(),
+            ),
+            (
+                "content-channel".to_string(),
+                ContentChannelTemplate::render(&ContentChannelTemplate {
+                    channel_handle: "".to_string(),
+                    channel_name: "".to_string(),
+                    channel_lang: "".to_string(),
+                    channel_description_html: "".to_string(),
+                    channel_date: "".to_string(),
+                    channel_date_value: "".to_string(),
+                    post_list_html: "".to_string(),
                 }).unwrap(),
             ),
             ("content-invites".to_string(), include_str!("../../templates/content_invites.html").to_string()),

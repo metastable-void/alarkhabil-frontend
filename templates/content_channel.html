@@ -1,0 +1,14 @@
+<div class="template-content template-content-channel" lang="{{ channel_lang }}">
+    <header class="channel-header">
+        <h1 class="channel-heading"><span class="channel-name">{{ channel_name }}</span></h1>
+        <div class="channel-handle">@<span class="channel-handle-value">{{ channel_handle }}</span></div>
+        <p class="channel-date"><time datetime="{{ channel_date_value }}">{{ channel_date }}</time></p>
+        <div class="channel-description">{{ channel_description_html|safe }}</div>
+    </header>
+    <div class="channel-posts">
+        <h2 class="channel-posts-heading">Posts</h2>
+        <div class="channel-posts-items">
+{{ post_list_html|safe }}
+        </div>
+    </div>
+</div>
