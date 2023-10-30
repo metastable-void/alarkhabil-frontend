@@ -317,6 +317,8 @@ pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
                     post_list_html: "".to_string(),
                 }).unwrap(),
             ),
+
+            // templates not used by server side rendering follows
             ("content-invites".to_string(), include_str!("../../templates/content_invites.html").to_string()),
         ].into_iter())
     })
