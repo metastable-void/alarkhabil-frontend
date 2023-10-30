@@ -33,3 +33,37 @@ routerBuilder.setFallbackHandler(handlerNotFound);
 routerBuilder.setErrorHandler(errorHandler);
 
 const router = routerBuilder.build();
+
+const navigate = (url: string) => {
+    const parsedUrl = new URL(url, document.location.href);
+    if (parsedUrl.origin !== document.location.origin) {
+        console.warn('Invalid navigation:', parsedUrl.href);
+        return;
+    }
+    const targetUrl = parsedUrl.href;
+    history.pushState(null, '', targetUrl);
+    router.handle(parsedUrl.pathname, parsedUrl.search);
+};
+
+document.addEventListener ('click', ev => {
+    const composedPath = ev.composedPath();
+    for (let target of composedPath) {
+        if (!('tagName' in target) || typeof target.tagName != 'string' || 'a' !== target.tagName.toLowerCase()) {
+            continue;
+        }
+        const anchor = target as HTMLAnchorElement;
+        if (!anchor.href) {
+            continue;
+        }
+        ev.preventDefault();
+        const action = new URL(anchor.href, location.href);
+        if (action.origin !== location.origin) {
+            console.log('external link followed:', action.href);
+            window.open(action.href, '_blank');
+        } else {
+            console.log('internal link followed:', action.href);
+            navigate(action.href);
+        }
+        return;
+    }
+});
