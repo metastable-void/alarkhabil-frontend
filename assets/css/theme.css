@@ -60,11 +60,12 @@ a:hover {
 
 .post-channel .post-channel-handle-outer {
   font-size: 1rem;
+  color: #888;
 }
 
 .post-author .post-author-uuid {
   font-size: 80%;
-  color: #aaa;
+  color: #888;
 }
 
 .post-author .post-author-uuid::before {
