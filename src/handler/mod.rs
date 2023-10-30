@@ -33,6 +33,7 @@ use crate::template::{
     ContentPostListItemTemplate,
     ContentChannelListItemTemplate,
     ContentChannelTemplate,
+    ContentPostTemplate,
 };
 use crate::unix_time::UnixTime;
 use crate::backend_api::BackendApi;
@@ -65,12 +66,24 @@ pub struct PostSummary {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChannelInfo {
-    uuid: String,
-    handle: String,
-    name: String,
-    created_date: u64,
-    lang: String,
-    description_text: String,
+    pub uuid: String,
+    pub handle: String,
+    pub name: String,
+    pub created_date: u64,
+    pub lang: String,
+    pub description_text: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PostInfo {
+    pub post_uuid: String,
+    pub channel: ChannelSummary,
+    pub tags: Vec<String>,
+    pub revision_uuid: String,
+    pub revision_date: u64,
+    pub title: String,
+    pub revision_text: String,
+    pub author: AuthorSummary,
 }
 
 pub async fn handler_root(request: Request<Body>) -> impl IntoResponse {
@@ -366,6 +379,49 @@ pub async fn handler_channel(
         let template = BaseTemplate::try_new(
             &url,
             Some(channel.name.as_str()),
+            &content_template.render()?,
+            &config,
+        )?;
+
+        Ok(HtmlTemplate(template).into_response())
+    }).await
+}
+
+pub async fn handler_post(
+    Path((channel_handle, post_uuid)): Path<(String, String)>,
+    request: Request<Body>,
+) -> impl IntoResponse {
+    result_into_response(async move {
+        let config = config::load_config().await;
+        let url = request.uri().path().to_string();
+
+        let mut query = HashMap::new();
+        query.insert("uuid".to_string(), post_uuid.clone());
+        let backend_api = BackendApi::new_v1(&config);
+        let bytes = backend_api.get_bytes("post/info", query).await?;
+        let post: PostInfo = serde_json::from_slice(&bytes)?;
+
+        if channel_handle != post.channel.handle {
+            return Ok(handler_404(request).await.into_response());
+        }
+
+        let updated_date = UnixTime::new(post.revision_date);
+        let content_template = ContentPostTemplate {
+            post_uuid: post.post_uuid.clone(),
+            title: post.title.clone(),
+            date: updated_date.default_format_in_timezone(config.server_timezone()),
+            date_value: updated_date.to_utc_datetime_string(),
+            channel_handle: post.channel.handle.clone(),
+            channel_name: post.channel.name.clone(),
+            channel_lang: post.channel.lang.clone(),
+            content_html: markdown::to_html(&post.revision_text),
+            author_uuid: post.author.uuid.clone(),
+            author_name: post.author.name.clone(),
+        };
+
+        let template = BaseTemplate::try_new(
+            &url,
+            Some(post.title.as_str()),
             &content_template.render()?,
             &config,
         )?;
