@@ -36,6 +36,7 @@ use crate::template::{
     ContentPostTemplate,
     ContentAuthorListItemTemplate,
     ContentAuthorTemplate,
+    ContentTagListItemTemplate,
 };
 use crate::unix_time::UnixTime;
 use crate::backend_api::BackendApi;
@@ -551,6 +552,53 @@ pub async fn handler_author(
         let template = BaseTemplate::try_new(
             &url,
             Some(author.name.as_str()),
+            &content_template.render()?,
+            &config,
+        )?;
+
+        Ok(HtmlTemplate(template).into_response())
+    }).await
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct TagListItem {
+    tag_name: String,
+    page_count: u64,
+}
+
+pub async fn handler_tag_list(
+    request: Request<Body>,
+) -> impl IntoResponse {
+    result_into_response(async move {
+        let config = config::load_config().await;
+        let url = request.uri().path().to_string();
+
+        let query = HashMap::new();
+
+        let backend_api = BackendApi::new_v1(&config);
+        let bytes = backend_api.get_bytes("tag/list", query).await?;
+        
+        let tags: Vec<TagListItem> = serde_json::from_slice(&bytes)?;
+        let mut html = String::new();
+        if tags.is_empty() {
+            let content_template = ContentSingleParagraphMessageTemplate {
+                message: "There is no tag in this list.".to_string(),
+            };
+            html.push_str(&content_template.render()?);
+        }
+        for tag in tags {
+            let content_template = ContentTagListItemTemplate::new(&tag.tag_name);
+            html.push_str(&content_template.render()?);
+        }
+
+        let content_template = ContentPostListTemplate {
+            post_list_title: "Tags".to_string(),
+            post_list_html: html,
+        };
+
+        let template = BaseTemplate::try_new(
+            &url,
+            Some("Tags"),
             &content_template.render()?,
             &config,
         )?;

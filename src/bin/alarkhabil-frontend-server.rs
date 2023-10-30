@@ -71,6 +71,9 @@ async fn main() -> anyhow::Result<()> {
         .route("/authors/", get(handler::handler_author_list))
         .route("/authors/:author_uuid/", get(handler::handler_author))
 
+        // tags
+        .route("/tags/", get(handler::handler_tag_list))
+
         // JavaScript required pages
         .route("/invites/", get(handler::handler_javascript_required))
         .route("/signup/", get(handler::handler_javascript_required))
