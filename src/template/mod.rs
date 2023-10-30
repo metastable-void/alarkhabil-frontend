@@ -179,6 +179,24 @@ impl ContentTagListItemTemplate {
     }
 }
 
+#[derive(Template)]
+#[template(path = "content_tag.html")]
+pub struct ContentTagTemplate {
+    pub tag_name: String,
+    pub tag_name_urlencoded: String,
+    pub post_list_html: String,
+}
+
+impl ContentTagTemplate {
+    pub fn new(tag_name: &str, post_list_html: &str) -> Self {
+        Self {
+            tag_name: tag_name.to_string(),
+            tag_name_urlencoded: urlencoding::encode(tag_name).to_string(),
+            post_list_html: post_list_html.to_string(),
+        }
+    }
+}
+
 // for use by JavaScript rendering
 pub static CONTENT_TEMPLATES: OnceLock<Vec<ContentTemplateItem>> = OnceLock::new();
 
@@ -289,6 +307,14 @@ pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
                 ContentTagListItemTemplate::render(&ContentTagListItemTemplate {
                     tag_name: "".to_string(),
                     tag_name_urlencoded: "".to_string(),
+                }).unwrap(),
+            ),
+            (
+                "content-tag".to_string(),
+                ContentTagTemplate::render(&ContentTagTemplate {
+                    tag_name: "".to_string(),
+                    tag_name_urlencoded: "".to_string(),
+                    post_list_html: "".to_string(),
                 }).unwrap(),
             ),
             ("content-invites".to_string(), include_str!("../../templates/content_invites.html").to_string()),

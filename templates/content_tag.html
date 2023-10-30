@@ -1,0 +1,14 @@
+<div class="template-content template-content-tag">
+    <div class="breadcrumbs">
+        <a href="/tags/">Tags</a> &gt; <strong>{{ tag_name }}</strong>
+    </div>
+    <header class="tag-header">
+        <h1 class="tag-heading">Tag: <span class="tag-name">{{ tag_name }}</span></h1>
+    </header>
+    <div class="tag-posts">
+        <h2 class="tag-posts-heading">Posts</h2>
+        <div class="tag-posts-items">
+{{ post_list_html|safe }}
+        </div>
+    </div>
+</div>

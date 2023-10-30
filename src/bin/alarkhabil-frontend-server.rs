@@ -73,6 +73,7 @@ async fn main() -> anyhow::Result<()> {
 
         // tags
         .route("/tags/", get(handler::handler_tag_list))
+        .route("/tags/:tag_name/", get(handler::handler_tag))
 
         // JavaScript required pages
         .route("/invites/", get(handler::handler_javascript_required))

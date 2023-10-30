@@ -37,6 +37,7 @@ use crate::template::{
     ContentAuthorListItemTemplate,
     ContentAuthorTemplate,
     ContentTagListItemTemplate,
+    ContentTagTemplate,
 };
 use crate::unix_time::UnixTime;
 use crate::backend_api::BackendApi;
@@ -605,6 +606,58 @@ pub async fn handler_tag_list(
         let template = BaseTemplate::try_new(
             &url,
             Some("Tags"),
+            &content_template.render()?,
+            &config,
+        )?;
+
+        Ok(HtmlTemplate(template).into_response())
+    }).await
+}
+
+pub async fn handler_tag(
+    Path(tag_name): Path<String>,
+    request: Request<Body>,
+) -> impl IntoResponse {
+    result_into_response(async move {
+        let config = config::load_config().await;
+        let url = request.uri().path().to_string();
+
+        let backend_api = BackendApi::new_v1(&config);
+        let mut query = HashMap::new();
+        query.insert("tag_name".to_string(), (&tag_name).to_string());
+        let bytes = backend_api.get_bytes("tag/posts", query).await?;
+        let posts: Vec<PostSummary> = serde_json::from_slice(&bytes)?;
+        
+        let mut html = String::new();
+        if posts.is_empty() {
+            let content_template = ContentSingleParagraphMessageTemplate {
+                message: "There is no post in this list.".to_string(),
+            };
+            html.push_str(&content_template.render()?);
+        }
+        for post in &posts {
+            let updated_date = UnixTime::new(post.revision_date);
+            let channel = post.channel.clone().unwrap();
+            let author = post.author.clone().unwrap();
+            let content_template = ContentPostListItemTemplate {
+                post_uuid: post.post_uuid.clone(),
+                title: post.title.clone(),
+                date: updated_date.default_format_in_timezone(config.server_timezone()),
+                date_value: updated_date.to_utc_datetime_string(),
+                channel_handle: channel.handle.clone(),
+                channel_name: channel.name.clone(),
+                channel_lang: channel.lang.clone(),
+                author_name: author.name.clone(),
+                author_uuid: author.uuid.clone(),
+            };
+            html.push_str(&content_template.render()?);
+        }
+
+        let content_template = ContentTagTemplate::new(&tag_name, &html);
+
+        let template = BaseTemplate::try_new(
+            &url,
+            Some(format!("Tag: {}", tag_name).as_str()),
             &content_template.render()?,
             &config,
         )?;
