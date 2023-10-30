@@ -295,6 +295,7 @@ export class Router {
     public handle(pathname: string, search: string): void {
         const matchedRoute = this.#match(pathname, search);
         if (matchedRoute == null && this.#fallbackHandler != null) {
+            console.info(`No route matches, falling back to the fallback handler: ${pathname}`);
             this.#callHandler(this.#fallbackHandler, new RouteParams(pathname, search, new Map()));
             return;
         } else if (matchedRoute == null) {
