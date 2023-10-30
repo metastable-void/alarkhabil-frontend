@@ -334,7 +334,11 @@ pub async fn handler_channel(
         let mut query = HashMap::new();
         query.insert("handle".to_string(), channel_handle);
         let backend_api = BackendApi::new_v1(&config);
-        let bytes = backend_api.get_bytes("channel/info", query).await?;
+        let bytes =  if let Ok(bytes) = backend_api.get_bytes("channel/info", query).await {
+            bytes
+        } else {
+            return Ok(handler_404(request).await.into_response());
+        };
         let channel: ChannelInfo = serde_json::from_slice(&bytes)?;
 
         let mut query = HashMap::new();
@@ -398,7 +402,11 @@ pub async fn handler_post(
         let mut query = HashMap::new();
         query.insert("uuid".to_string(), post_uuid.clone());
         let backend_api = BackendApi::new_v1(&config);
-        let bytes = backend_api.get_bytes("post/info", query).await?;
+        let bytes = if let Ok(bytes) = backend_api.get_bytes("post/info", query).await {
+            bytes
+        } else {
+            return Ok(handler_404(request).await.into_response());
+        };
         let post: PostInfo = serde_json::from_slice(&bytes)?;
 
         if channel_handle != post.channel.handle {
