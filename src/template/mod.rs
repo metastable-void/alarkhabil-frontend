@@ -95,6 +95,20 @@ pub struct ContentSingleParagraphMessageTemplate {
     pub message: String,
 }
 
+#[derive(Template)]
+#[template(path = "content_post_list_item.html")]
+pub struct ContentPostListItemTemplate {
+    pub post_uuid: String,
+    pub title: String,
+    pub date: String,
+    pub date_value: String, // for <time datetime="...">
+    pub author_uuid: String,
+    pub author_name: String,
+    pub channel_handle: String,
+    pub channel_name: String,
+    pub channel_lang: String,
+}
+
 pub static CONTENT_TEMPLATES: OnceLock<Vec<ContentTemplateItem>> = OnceLock::new();
 
 pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
@@ -129,6 +143,20 @@ pub fn content_templates() -> &'static Vec<ContentTemplateItem> {
                 "content-single-paragraph-message".to_string(),
                 ContentSingleParagraphMessageTemplate::render(&ContentSingleParagraphMessageTemplate {
                     message: "".to_string(),
+                }).unwrap(),
+            ),
+            (
+                "content-post-list-item".to_string(),
+                ContentPostListItemTemplate::render(&ContentPostListItemTemplate {
+                    post_uuid: "".to_string(),
+                    title: "".to_string(),
+                    date: "".to_string(),
+                    date_value: "".to_string(),
+                    author_uuid: "".to_string(),
+                    author_name: "".to_string(),
+                    channel_handle: "".to_string(),
+                    channel_name: "".to_string(),
+                    channel_lang: "".to_string(),
                 }).unwrap(),
             ),
             ("content-invites".to_string(), include_str!("../../templates/content_invites.html").to_string()),

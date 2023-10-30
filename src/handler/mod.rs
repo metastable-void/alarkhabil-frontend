@@ -30,27 +30,79 @@ use crate::template::{
     ContentPostListTemplate,
     ContentMetaPageListItemTemplate,
     ContentSingleParagraphMessageTemplate,
+    ContentPostListItemTemplate,
 };
 use crate::unix_time::UnixTime;
 use crate::backend_api::BackendApi;
 use crate::markdown;
 
 
-pub async fn handler_root() -> impl IntoResponse {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AuthorSummary {
+    pub uuid: String,
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChannelSummary {
+    pub uuid: String,
+    pub handle: String,
+    pub name: String,
+    pub lang: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PostSummary {
+    pub post_uuid: String,
+    pub revision_uuid: String,
+    pub revision_date: u64,
+    pub title: String,
+    pub author: Option<AuthorSummary>,
+    pub channel: Option<ChannelSummary>,
+}
+
+pub async fn handler_root(request: Request<Body>) -> impl IntoResponse {
     result_into_response(async move {
+        let url = request.uri().path().to_string();
         let config = config::load_config().await;
 
-        let now = UnixTime::now();
+        let query = HashMap::new();
+        let backend_api = BackendApi::new_v1(&config);
+        let bytes = backend_api.get_bytes("post/list", query).await?;
+        
+        let posts: Vec<PostSummary> = serde_json::from_slice(&bytes)?;
+        let mut html = String::new();
+        if posts.is_empty() {
+            let content_template = ContentSingleParagraphMessageTemplate {
+                message: "There is no post in this list.".to_string(),
+            };
+            html.push_str(&content_template.render()?);
+        }
+        for post in posts {
+            let updated_date = UnixTime::new(post.revision_date);
+            let author = post.author.unwrap();
+            let channel = post.channel.unwrap();
+            let content_template = ContentPostListItemTemplate {
+                post_uuid: post.post_uuid.clone(),
+                title: post.title.clone(),
+                date: updated_date.default_format_in_timezone(config.server_timezone()),
+                date_value: updated_date.to_utc_datetime_string(),
+                author_uuid: author.uuid.clone(),
+                author_name: author.name.clone(),
+                channel_handle: channel.handle.clone(),
+                channel_name: channel.name.clone(),
+                channel_lang: channel.lang.clone(),
+            };
+            html.push_str(&content_template.render()?);
+        }
 
-        let content_template = ContentMetaPageTemplate {
-            content_heading: "It works!".to_string(),
-            content_date: now.default_format_in_timezone(config.server_timezone()),
-            content_date_value: now.to_utc_datetime_string(),
-            content_html: "<p>Hello, world!</p>".to_string(),
+        let content_template = ContentPostListTemplate {
+            post_list_title: "Latest Posts".to_string(),
+            post_list_html: html,
         };
 
         let template = BaseTemplate::try_new(
-            "/",
+            &url,
             None,
             &content_template.render()?,
             &config,

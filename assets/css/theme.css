@@ -53,3 +53,24 @@ a:hover {
   background-color: #fff;
   mask: var(--url-logo) center / contain no-repeat add alpha;
 }
+
+.post-channel {
+  font-size: 120%;
+}
+
+.post-channel .post-channel-handle-outer {
+  font-size: 1rem;
+}
+
+.post-author .post-author-uuid {
+  font-size: 80%;
+  color: #aaa;
+}
+
+.post-author .post-author-uuid::before {
+  content: '(';
+}
+
+.post-author .post-author-uuid::after {
+  content: ')';
+}

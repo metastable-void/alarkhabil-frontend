@@ -2,7 +2,7 @@
     "api_url": "http://localhost:7781",
     "site_name": "Al Arkhabil الأرخبيل",
     "site_description": "Al Arkhabil is an independent thought publication platform developed in Japan.",
-    "site_copyright": "© Copyright subject to their respective owners.",
+    "site_copyright": "© Copyrights subject to their respective owners.",
     "top_url": "http://localhost:7780",
     "og_image": "/branding/og_image.png",
     "server_timezone": "Asia/Tokyo",
