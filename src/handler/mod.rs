@@ -254,14 +254,6 @@ pub async fn handler_meta_list(
     }).await
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct ChannelListItem {
-    uuid: String,
-    handle: String,
-    name: String,
-    lang: String,
-}
-
 pub async fn handler_channel_list(
     request: Request<Body>,
 ) -> impl IntoResponse {
@@ -274,7 +266,7 @@ pub async fn handler_channel_list(
         let backend_api = BackendApi::new_v1(&config);
         let bytes = backend_api.get_bytes("channel/list", query).await?;
         
-        let channels: Vec<ChannelListItem> = serde_json::from_slice(&bytes)?;
+        let channels: Vec<ChannelSummary> = serde_json::from_slice(&bytes)?;
         let mut html = String::new();
         if channels.is_empty() {
             let content_template = ContentSingleParagraphMessageTemplate {
