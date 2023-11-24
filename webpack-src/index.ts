@@ -27,6 +27,7 @@ const navigate = (url: string) => {
 
 window.addEventListener('popstate', _ev => {
     const url = new URL(document.location.href);
+    console.log('popstate:', url.href);
     router.handle(url.pathname, url.search);
 });
 
