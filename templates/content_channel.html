@@ -1,11 +1,11 @@
 <div class="template-content template-content-channel" lang="{{ channel_lang }}">
     <div class="breadcrumbs">
-        <a href="/c/">Channels</a> &gt; <strong>{{ channel_handle }}</strong>
+        <a href="/c/">Channels</a> &gt; <strong class="breadcrumbs-channel-handle">{{ channel_handle }}</strong>
     </div>
     <header class="channel-header">
         <h1 class="channel-heading"><span class="channel-name">{{ channel_name }}</span></h1>
         <div class="channel-handle">@<span class="channel-handle-value">{{ channel_handle }}</span></div>
-        <p class="channel-date"><time datetime="{{ channel_date_value }}">{{ channel_date }}</time></p>
+        <p class="channel-date"><time class="channel-date-time" datetime="{{ channel_date_value }}">{{ channel_date }}</time></p>
         <div class="channel-description">{{ channel_description_html|safe }}</div>
     </header>
     <div class="channel-posts">

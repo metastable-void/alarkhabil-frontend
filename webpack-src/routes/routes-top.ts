@@ -27,6 +27,7 @@ routerBuilder.add('/', async (_routeParams) => {
     }
     for (const post of posts) {
         const postElement = instantiateTemplate('template-content-post-list-item', postListItemsElement);
+        postElement.lang = post.channel!.lang;
         postElement.querySelector<HTMLAnchorElement>('.post-channel-name-link')!.href = `/c/${post.channel!.handle}/`;
         postElement.querySelector<HTMLAnchorElement>('.post-channel-handle-link')!.href = `/c/${post.channel!.handle}/`;
         postElement.querySelector<HTMLElement>('.post-channel-name')!.textContent = post.channel!.name;
