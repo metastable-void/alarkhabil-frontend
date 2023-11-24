@@ -2,6 +2,7 @@
 import { routerBuilder, commonHandler } from "../routes-common";
 import { instantiateTemplate, content, parseHTML } from "../render";
 import { DnsToken } from "../dns-token";
+import { Uuid } from "../uuid";
 import { TimestampFormatResult } from "../frontend-api";
 
 routerBuilder.add('/c/', async (routeParams) => {
@@ -79,4 +80,37 @@ routerBuilder.add('/c/:channelHandle/', async (routeParams) => {
         postElement.querySelector<HTMLElement>('.post-author-name')!.textContent = post.author!.name;
         postElement.querySelector<HTMLElement>('.post-author-uuid')!.textContent = post.author!.uuid;
     }
+});
+
+routerBuilder.add('/c/:channelHandle/:postUuid/', async (routeParams) => {
+    const channelHandle = DnsToken(routeParams.placeholders.get('channelHandle')!);
+    const postUuid = Uuid(routeParams.placeholders.get('postUuid')!);
+    const post = await alarkhabil.backendApi.post.get(postUuid);
+    const timestamp = await alarkhabil.frontendApi.formatTimestampInSeconds(post.revisionDate);
+    const html = await alarkhabil.frontendApi.parseMarkdown(post.revisionText);
+
+    commonHandler(routeParams, false, post.title);
+    content.textContent = '';
+    const postElement = instantiateTemplate('template-content-post', content);
+    postElement.lang = post.channel!.lang;
+    postElement.querySelector<HTMLAnchorElement>('.post-channel-name-link')!.href = `/c/${post.channel!.handle}/`;
+    postElement.querySelector<HTMLAnchorElement>('.post-channel-handle-link')!.href = `/c/${post.channel!.handle}/`;
+    postElement.querySelector<HTMLElement>('.post-channel-name')!.textContent = post.channel!.name;
+    postElement.querySelector<HTMLElement>('.post-channel-handle')!.textContent = post.channel!.handle;
+    postElement.querySelector<HTMLElement>('.post-title')!.textContent = post.title;
+    const postDateTimeElement = postElement.querySelector<HTMLTimeElement>('.post-date-time')!;
+    postDateTimeElement.dateTime = timestamp.datetime;
+    postDateTimeElement.textContent = timestamp.formatted;
+    postElement.querySelector<HTMLAnchorElement>('.post-author-link')!.href = `/author/${post.author!.uuid}/`;
+    postElement.querySelector<HTMLElement>('.post-author-name')!.textContent = post.author!.name;
+    postElement.querySelector<HTMLElement>('.post-author-uuid')!.textContent = post.author!.uuid;
+    const postTagsElement = postElement.querySelector<HTMLElement>('.post-tags')!;
+    for (const tag of post.tags) {
+        const tagElement = instantiateTemplate('template-content-tag-list-item', postTagsElement);
+        const tagNameElement = tagElement.querySelector<HTMLAnchorElement>('.tag-name')!;
+        tagNameElement.href = `/tag/${encodeURIComponent(tag)}/`;
+        tagNameElement.textContent = tag;
+    }
+    const postBodyElement = postElement.querySelector<HTMLElement>('.post-body')!;
+    postBodyElement.appendChild(parseHTML(html));
 });

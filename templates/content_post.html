@@ -1,13 +1,13 @@
 <div class="template-content template-content-post" lang="{{ channel_lang }}">
     <header class="post-header">
         <div class="post-channel">
-            <a href="/c/{{ channel_handle }}/"><span class="post-channel-name">{{ channel_name }}</span></a>
-            <a class="post-channel-handle-outer" href="/c/{{ channel_handle }}/">@<span class="post-channel-handle">{{ channel_handle }}</span></a>
+            <a class="post-channel-name-link" href="/c/{{ channel_handle }}/"><span class="post-channel-name">{{ channel_name }}</span></a>
+            <a class="post-channel-handle-link" href="/c/{{ channel_handle }}/">@<span class="post-channel-handle">{{ channel_handle }}</span></a>
         </div>
         <h1 class="post-title">{{ title }}</h1>
-        <p class="post-date"><time datetime="{{ date_value }}">{{ date }}</time></p>
+        <p class="post-date"><time class="post-date-time" datetime="{{ date_value }}">{{ date }}</time></p>
         <div class="post-author">
-            <a href="/authors/{{ author_uuid }}/">
+            <a class="post-author-link" href="/authors/{{ author_uuid }}/">
                 <span class="post-author-name">{{ author_name }}</span>
                 <span class="post-author-uuid">{{ author_uuid }}</span>
             </a>
