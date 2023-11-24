@@ -39,7 +39,7 @@ routerBuilder.add('/', async (_routeParams) => {
         const timestamp = postTimestampMap.get(post.revisionDate)!;
         postDateTimeElement.dateTime = timestamp.datetime;
         postDateTimeElement.textContent = timestamp.formatted;
-        postElement.querySelector<HTMLAnchorElement>('.post-author-link')!.href = `/author/${post.author!.uuid}/`;
+        postElement.querySelector<HTMLAnchorElement>('.post-author-link')!.href = `/authors/${post.author!.uuid}/`;
         postElement.querySelector<HTMLElement>('.post-author-name')!.textContent = post.author!.name;
         postElement.querySelector<HTMLElement>('.post-author-uuid')!.textContent = post.author!.uuid;
     }
