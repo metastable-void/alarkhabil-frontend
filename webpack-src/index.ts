@@ -46,9 +46,11 @@ document.addEventListener ('click', ev => {
         if (action.origin !== location.origin) {
             console.log('external link followed:', action.href);
             window.open(action.href, '_blank');
-        } else {
+        } else if (action.href !== location.href) {
             console.log('internal link followed:', action.href);
             navigate(action.href);
+        } else {
+            console.log('link clicked:', action.href);
         }
         return;
     }
