@@ -25,6 +25,11 @@ const navigate = (url: string) => {
     router.handle(parsedUrl.pathname, parsedUrl.search);
 };
 
+window.addEventListener('popstate', _ev => {
+    const url = new URL(document.location.href);
+    router.handle(url.pathname, url.search);
+});
+
 document.addEventListener ('click', ev => {
     const composedPath = ev.composedPath();
     for (let target of composedPath) {
