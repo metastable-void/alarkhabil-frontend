@@ -1,6 +1,7 @@
 
 import { Router, RouteHandler, ErrorRouteHandler, RouteParams } from './router';
 import { PageMetadata } from './page-metadata';
+import { instantiateTemplate, content } from "./render";
 import './alarkhabil';
 
 export const routerBuilder: Router.Builder = new Router.Builder();
@@ -23,10 +24,15 @@ export const commonHandler = (params: RouteParams, isError: boolean, title = '')
 
 export const handlerNotFound: RouteHandler = (params) => {
     commonHandler(params, true, 'Not Found');
+    content.textContent = '';
+    content.appendChild(document.createElement('h1')).textContent = '404: Not Found';
 };
 
 export const errorHandler: ErrorRouteHandler = (params, error) => {
     commonHandler(params, true, 'Error');
+    content.textContent = '';
+    content.appendChild(document.createElement('h1')).textContent = 'Error';
+    content.appendChild(document.createElement('pre')).textContent = String(error);
 };
 
 routerBuilder.setFallbackHandler(handlerNotFound);
