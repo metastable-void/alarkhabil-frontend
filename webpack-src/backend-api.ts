@@ -1,5 +1,5 @@
 
-import { Api } from "./api";
+import { Api, ApiResult } from "./api";
 import * as urls from "./urls";
 import { BackendApiInvite } from "./backend/invite";
 import { BackendApiAccount } from "./backend/account";
@@ -67,6 +67,12 @@ export class BackendApi {
             throw new Error('Invalid token.');
         }
         this.#state.backendUrl = urls.resolve(backendUrl, '/');
+    }
+
+    public async v1PostSigned<TRequest, TResponse>(authToken: symbol, endpointUrl: string, message: TRequest): Promise<ApiResult<TResponse>> {
+        const authorKey = await alarkhabil.getAuthorKey(this.#urlUpdateToken, authToken);
+        const signedMessage = await authorKey.sign(message);
+        return this.v1.postSigned<TResponse>(endpointUrl, signedMessage);
     }
 }
 

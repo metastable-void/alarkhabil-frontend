@@ -8,6 +8,7 @@ import { Uuid } from "./uuid";
 import { EncryptedStorage } from "./storage/storage";
 import { InviteToken } from "./invite-token";
 import { PageMetadata } from "./page-metadata";
+import * as ed25519 from './crypto/ed25519';
 
 
 /**
@@ -103,6 +104,19 @@ export class Alarkhabil {
     #generateAuthToken(): symbol {
         const now = Date.now();
         return Symbol(`AUTH_TOKEN_${now}`);
+    }
+
+    public async getAuthorKey(backendApiToken: symbol, authToken: symbol): Promise<ed25519.PrivateKey> {
+        if (backendApiToken !== Alarkhabil.#BACKEND_API_UPDATE_TOKEN) {
+            throw new Error('Invalid backend API token.');
+        }
+        if (authToken !== this.#state.authToken) {
+            throw new Error('Invalid auth token.');
+        }
+        if (!this.#state.credential) {
+            throw new Error('Not signed in.');
+        }
+        return this.#state.credential.getBackendAuthPrivateKey();
     }
 
     /**

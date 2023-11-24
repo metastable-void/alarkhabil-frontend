@@ -122,15 +122,14 @@ export class BackendApiChannel {
         });
     }
 
-    public async createNew(privateKey: ed25519.PrivateKey, handle: DnsToken, name: string, lang: string): Promise<ChannelDetails> {
+    public async createNew(authToken: symbol, handle: DnsToken, name: string, lang: string): Promise<ChannelDetails> {
         const msg: MsgChannelNew = {
             command: 'channel_new',
             handle: handle,
             name: name,
             lang: lang,
         };
-        const signedMessage = await privateKey.sign(msg);
-        const result = await this.#backendApi.v1.postSigned<ResponseChannelInfo>('channel/new', signedMessage);
+        const result = await this.#backendApi.v1PostSigned<MsgChannelNew, ResponseChannelInfo>(authToken, 'channel/new', msg);
         if (!result.ok) {
             throw new Error(`Failed to create a channel: ${result.status}`);
         }
@@ -144,7 +143,7 @@ export class BackendApiChannel {
         };
     }
 
-    public async update(privateKey: ed25519.PrivateKey, uuid: Uuid, handle: DnsToken, name: string, lang: string, descriptionText: string): Promise<ChannelDetails> {
+    public async update(authToken: symbol, uuid: Uuid, handle: DnsToken, name: string, lang: string, descriptionText: string): Promise<ChannelDetails> {
         const msg: MsgChannelUpdate = {
             command: 'channel_update',
             uuid: uuid,
@@ -153,8 +152,7 @@ export class BackendApiChannel {
             lang: lang,
             description_text: descriptionText,
         };
-        const signedMessage = await privateKey.sign(msg);
-        const result = await this.#backendApi.v1.postSigned<ResponseChannelInfo>('channel/update', signedMessage);
+        const result = await this.#backendApi.v1PostSigned<MsgChannelUpdate, ResponseChannelInfo>(authToken, 'channel/update', msg);
         if (!result.ok) {
             throw new Error(`Failed to update a channel: ${result.status}`);
         }
@@ -168,13 +166,12 @@ export class BackendApiChannel {
         };
     }
 
-    public async delete(privateKey: ed25519.PrivateKey, uuid: Uuid): Promise<void> {
+    public async delete(authToken: symbol, uuid: Uuid): Promise<void> {
         const msg: MsgChannelDelete = {
             command: 'channel_delete',
             uuid: uuid,
         };
-        const signedMessage = await privateKey.sign(msg);
-        const result = await this.#backendApi.v1.postSigned<unknown>('channel/delete', signedMessage);
+        const result = await this.#backendApi.v1PostSigned<MsgChannelDelete, unknown>(authToken, 'channel/delete', msg);
         if (!result.ok) {
             throw new Error(`Failed to delete a channel: ${result.status}`);
         }

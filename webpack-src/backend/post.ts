@@ -183,7 +183,7 @@ export class BackendApiPost {
     }
 
     public async createNew(
-        privateKey: ed25519.PrivateKey,
+        authToken: symbol,
         channelUuid: Uuid,
         title: string,
         text: string,
@@ -196,8 +196,7 @@ export class BackendApiPost {
             title: title,
             text: text,
         };
-        const signedMessage = await privateKey.sign(msg);
-        const result = await this.#backendApi.v1.postSigned<ResponsePageInfo>('post/new', signedMessage);
+        const result = await this.#backendApi.v1PostSigned<MsgPostNew, ResponsePageInfo>(authToken, 'post/new', msg);
         if (!result.ok) {
             throw new Error(`Failed to create new post: ${result.status}`);
         }
@@ -205,7 +204,7 @@ export class BackendApiPost {
     }
 
     public async update(
-        privateKey: ed25519.PrivateKey,
+        authToken: symbol,
         uuid: Uuid,
         title: string,
         text: string,
@@ -218,8 +217,7 @@ export class BackendApiPost {
             title: title,
             text: text,
         };
-        const signedMessage = await privateKey.sign(msg);
-        const result = await this.#backendApi.v1.postSigned<ResponsePageInfo>('post/update', signedMessage);
+        const result = await this.#backendApi.v1PostSigned<MsgPostUpdate, ResponsePageInfo>(authToken, 'post/update', msg);
         if (!result.ok) {
             throw new Error(`Failed to update post: ${result.status}`);
         }
@@ -227,15 +225,14 @@ export class BackendApiPost {
     }
 
     public async delete(
-        privateKey: ed25519.PrivateKey,
+        authToken: symbol,
         uuid: Uuid,
     ): Promise<void> {
         const msg: MsgPostDelete = {
             command: 'post_delete',
             uuid: uuid.toString(),
         };
-        const signedMessage = await privateKey.sign(msg);
-        const result = await this.#backendApi.v1.postSigned('post/delete', signedMessage);
+        const result = await this.#backendApi.v1PostSigned(authToken, 'post/delete', msg);
         if (!result.ok) {
             throw new Error(`Failed to delete post: ${result.status}`);
         }
