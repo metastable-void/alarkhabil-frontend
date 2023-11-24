@@ -15,3 +15,13 @@ export const instantiateTemplate = (templateId: string, parentElement: HTMLEleme
 };
 
 export const content = document.getElementById('content') as HTMLElement;
+
+export const parseHTML = (html: string): DocumentFragment => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const fragment = document.createDocumentFragment();
+    while (doc.body.firstChild) {
+        fragment.appendChild(doc.body.firstChild);
+    }
+    return fragment;
+};

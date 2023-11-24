@@ -1,8 +1,7 @@
 
 import { routerBuilder, commonHandler } from "../routes-common";
-import { instantiateTemplate, content } from "../template";
+import { instantiateTemplate, content } from "../render";
 import { TimestampFormatResult } from "../frontend-api";
-import '../alarkhabil';
 
 routerBuilder.add('/', async (_routeParams) => {
     const posts = await alarkhabil.backendApi.post.list();
