@@ -2,7 +2,7 @@
 use std::collections::HashMap;
 
 use url::Url;
-use hyper::{Client, Uri};
+
 
 use crate::config::Config;
 
@@ -47,13 +47,8 @@ impl BackendApi {
 
     pub async fn get_bytes(&self, path: &str, query: HashMap<String, String>) -> Result<Vec<u8>, anyhow::Error> {
         let url = self.get_url(path, &query)?;
-        let uri: Uri = url.parse()?;
-        let client = Client::new();
-        let res = client.get(uri).await?;
-        if !res.status().is_success() {
-            return Err(anyhow::anyhow!("Failed to get url: {}", url));
-        }
-        let buf = hyper::body::to_bytes(res.into_body()).await?;
-        Ok(buf.to_vec())
+        let response = reqwest::get(&url).await?;
+        let bytes = response.bytes().await?;
+        Ok(bytes.to_vec())
     }
 }

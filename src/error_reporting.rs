@@ -3,7 +3,7 @@ use std::future::Future;
 
 use serde::{Serialize, Deserialize};
 
-use hyper::StatusCode;
+use axum::http::StatusCode;
 use axum::response::{Html, IntoResponse};
 
 

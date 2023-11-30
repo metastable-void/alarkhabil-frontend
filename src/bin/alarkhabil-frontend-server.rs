@@ -4,13 +4,12 @@ use std::net::SocketAddr;
 use std::str::FromStr;
 use std::path::PathBuf;
 
-use hyper::Request;
 use axum::{
+    http::Request,
     routing::{get, post},
     Router,
-    Server,
     response::Response,
-    middleware::Next,
+    middleware::Next, body::Body,
 };
 use tower_http::services::ServeDir;
 
@@ -27,7 +26,7 @@ fn is_dir(path: &str) -> bool {
 }
 
 /// Middleware to add global headers to all responses.
-async fn add_global_headers<B>(req: Request<B>, next: Next<B>) -> Response {
+async fn add_global_headers(req: Request<Body>, next: Next) -> Response {
     let mut res = next.run(req).await;
     let headers = res.headers_mut();
     headers.append("content-security-policy", RESPONSE_HEADER_CSP.parse().unwrap());
@@ -97,7 +96,8 @@ async fn main() -> anyhow::Result<()> {
         .layer(axum::middleware::from_fn(add_global_headers));
 
     // run server
-    let server = Server::bind(&addr).serve(app.into_make_service());
+    let listener = tokio::net::TcpListener::bind(&addr).await?;
+    let server = axum::serve(listener, app);
 
     log::info!("Listening on http://{}", &addr);
 
